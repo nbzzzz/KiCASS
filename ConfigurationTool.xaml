@@ -1,0 +1,21 @@
+﻿<Window x:Class="LaptopOrchestra.Kinect.ConfigurationTool"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="ConfigurationTool" Height="300" Width="300">
+    <Grid>
+        <CheckBox
+	    Content="LeftHand"
+	    HorizontalAlignment="Left"
+	    Margin="50,110,0,0"
+	    VerticalAlignment="Top"
+	    Checked="LeftHandChecked"
+	    Unchecked="LeftHandUnchecked"/>
+        <CheckBox
+	    Content="RightHand"
+	    HorizontalAlignment="Left"
+	    Margin="180,110,0,0"
+	    VerticalAlignment="Top"
+	    Checked="RightHandChecked"
+	    Unchecked="RightHandUnchecked"/>
+    </Grid>
+</Window>
