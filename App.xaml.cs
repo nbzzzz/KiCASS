@@ -49,7 +49,7 @@ namespace LaptopOrchestra.Kinect
             configurationTool.Show();
 
             KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
-            kinectSimulator.Top = 600;
+            kinectSimulator.Top = 200;
             kinectSimulator.Left = 600;
             kinectSimulator.Show();
 

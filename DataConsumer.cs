@@ -11,6 +11,9 @@ namespace LaptopOrchestra.Kinect
 {
     class DataConsumer
     {
+
+        public delegate void UpdateSkeleton(IReadOnlyDictionary<JointType, Joint> joints);
+
         /// <summary>
         /// Queue where the sensor will add data to
         /// </summary>
@@ -25,6 +28,7 @@ namespace LaptopOrchestra.Kinect
         {
             this.queue = queue;
             this.configurationFlags = configurationFlags;
+
         }
 
         public void consume()
@@ -46,11 +50,13 @@ namespace LaptopOrchestra.Kinect
                     if (configurationFlags.rightHand) {
                         Console.WriteLine("Right Hand: ({0}, {1}, {2})", position.X, position.Y, position.Z);
                     }
+
+
                 }
                 else
                 {
                     //TODO: Monitor the size of the queue if we should decrease this
-                    Thread.Sleep(5000);
+                    //Thread.Sleep(5000);
                 }
             }
         }
