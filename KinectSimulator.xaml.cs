@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Windows;
+using Microsoft.Kinect;
+using System.IO;
+using System.Windows.Controls;
+
 
 namespace LaptopOrchestra.Kinect
 {
-    using Microsoft.Kinect;
+
 
     /// <summary>
     /// Interaction logic for KinectSimulator
@@ -19,109 +21,42 @@ namespace LaptopOrchestra.Kinect
         private Queue<IReadOnlyDictionary<JointType, Joint>> queue = null;
 
         /// <summary>
-        /// IDictionaryObject representing our body
+        /// List of kinect simulator data
         /// </summary>
-        private IDictionary<JointType, Joint> joints = null;
+        public List<KinectSimulatorData> simulatorDataList = null;
 
         public KinectSimulator(Queue<IReadOnlyDictionary<JointType, Joint>> queue)
         {
             // Set the communication queue
             this.queue = queue;
 
-            // Initalize our skeleton
-            this.joints = new Dictionary<JointType, Joint>();
+            // Initialize our simulate data list
+            simulatorDataList = new List<KinectSimulatorData>();
 
-            //var JointTypes = Enum.GetValues(typeof(JointType));
-            var JointTypes = Enum.GetValues(typeof(JointType)).Cast<JointType>(); ;
+            // Parse our Kinect Simulator Data csv 
+            string[] allLines = File.ReadAllLines(@"C:\Projects\CapstoneKinectLaptopOrchestra\SimulatorData\shoot.csv");
 
-            foreach (var jt in JointTypes)
-            {
-                CameraSpacePoint position = new CameraSpacePoint();
-                position.X = 10;
-                position.Y = 10;
-                position.Z = 10;
-
-                Joint joint = new Joint();
-                joint.JointType = jt;
-                joint.TrackingState = TrackingState.Tracked;
-                joint.Position = position;
-
-                joints.Add(jt, joint);
+            foreach (var line in allLines){
+                simulatorDataList.Add(new KinectSimulatorData(line.Split(' ')));
             }
 
             InitializeComponent();
         }
 
-        private void LeftHandLeft(object sender, RoutedEventArgs e)
+        private void dataGrid_Loaded(object sender, RoutedEventArgs e)
         {
-            var joint = joints[JointType.HandLeft];
-            joint.Position.X--;
-            joints[JointType.HandLeft] = joint;
+            var grid = sender as DataGrid;
+            grid.ItemsSource = simulatorDataList;
 
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
         }
 
-        private void LeftHandRight(object sender, RoutedEventArgs e)
+        private void flushToQueue_Click(object sender, RoutedEventArgs e)
         {
-            var joint = joints[JointType.HandLeft];
-            joint.Position.X++;
-            joints[JointType.HandLeft] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
+            foreach (var simulatorData in simulatorDataList){
+                queue.Enqueue(simulatorData.toKinectData());
+            }
         }
 
-        private void LeftHandUp(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandLeft];
-            joint.Position.Y++;
-            joints[JointType.HandLeft] = joint;
 
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
-
-        private void LeftHandDown(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandLeft];
-            joint.Position.Y--;
-            joints[JointType.HandLeft] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
-
-        private void RightHandLeft(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandRight];
-            joint.Position.X--;
-            joints[JointType.HandRight] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
-
-        private void RightHandRight(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandRight];
-            joint.Position.X++;
-            joints[JointType.HandRight] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
-
-        private void RightHandUp(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandRight];
-            joint.Position.Y++;
-            joints[JointType.HandRight] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
-
-        private void RightHandDown(object sender, RoutedEventArgs e)
-        {
-            var joint = joints[JointType.HandRight];
-            joint.Position.Y--;
-            joints[JointType.HandRight] = joint;
-
-            queue.Enqueue((IReadOnlyDictionary<JointType, Joint>)joints);
-        }
     }
 }

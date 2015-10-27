@@ -96,7 +96,7 @@
     </Compile>
     <Compile Include="DataConsumer.cs" />
     <Compile Include="KinectProcessor.cs" />
-    <Compile Include="SkeletonVisualizer.cs" />
+    <Compile Include="KinectSimulatorData.cs" />
     <Compile Include="KinectSimulator.xaml.cs">
       <DependentUpon>KinectSimulator.xaml</DependentUpon>
     </Compile>
@@ -137,6 +137,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SimulatorData\shoot.csv" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
