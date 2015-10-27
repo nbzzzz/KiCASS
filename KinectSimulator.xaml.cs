@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Windows;
-
+using Microsoft.Kinect;
+using System.IO;
+using System.Windows.Controls;
 
 
 namespace LaptopOrchestra.Kinect
 {
-    using Microsoft.Kinect;
-    using System.IO;
-    using System.Text;
-    using System.Windows.Controls;
+
 
     /// <summary>
     /// Interaction logic for KinectSimulator
