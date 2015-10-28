@@ -28,19 +28,12 @@ namespace LaptopOrchestra.Kinect
 
         public OscMessage BuildDistanceMessage(Joint joint1, Joint joint2)
         {	
-			var address = String.Format("/kinect/vector/{0}/{1}", joint1.JointType, joint2.JointType);
+			var address = String.Format("/kinect/distance/{0}/{1}", joint1.JointType, joint2.JointType);
 			var xDist = joint2.Position.X - joint1.Position.X;
             var yDist = joint2.Position.Y - joint1.Position.Y;
             var zDist = joint2.Position.Z - joint1.Position.Z;
             var absDist = Math.Sqrt(xDist * xDist + yDist * yDist* + zDist * zDist);
 			return new OscMessage(address, absDist);
-        }
-
-        //incomplete
-        public OscMessage BuildHandMessage(HandState hand)
-        {
-            var address = String.Format("/kinect/hand/");
-            return new OscMessage(address);
         }
     }
 }
