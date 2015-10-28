@@ -34,7 +34,7 @@ namespace LaptopOrchestra.Kinect
             simulatorDataList = new List<KinectSimulatorData>();
 
             // Parse our Kinect Simulator Data csv 
-            string[] allLines = File.ReadAllLines(@"C:\Projects\CapstoneKinectLaptopOrchestra\SimulatorData\shoot.csv");
+            string[] allLines = File.ReadAllLines(@"SimulatorData\shoot.csv");
 
             foreach (var line in allLines){
                 simulatorDataList.Add(new KinectSimulatorData(line.Split(' ')));
