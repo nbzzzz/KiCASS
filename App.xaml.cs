@@ -9,6 +9,7 @@ namespace LaptopOrchestra.Kinect
     using Microsoft.Kinect;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Threading;
     using System.Windows;
 
@@ -22,12 +23,7 @@ namespace LaptopOrchestra.Kinect
         /// Queue to communicate between Kinect Data Producer and Data Comsumer
         /// </summary>
         private Queue<IReadOnlyDictionary<JointType,Joint>> queue = null;
-
-        /// <summary>
-        /// Flags to indidcate which data set to send to OSC
-        /// </summary>
-        private ConfigurationFlags configurationFlags = new ConfigurationFlags();
-
+        
         /// <summary>
         /// Execute start up tasks
         /// </summary>
@@ -43,17 +39,18 @@ namespace LaptopOrchestra.Kinect
 //            mainWindow.Left = 500;
 //            mainWindow.Show();
 
-            ConfigurationTool configurationTool = new ConfigurationTool(this.configurationFlags);
+            ConfigurationTool configurationTool = new ConfigurationTool();
             configurationTool.Top = 200;
             configurationTool.Left = 500;
             configurationTool.Show();
+            
 
             KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
             kinectSimulator.Top = 200;
             kinectSimulator.Left = 600;
             kinectSimulator.Show();
 
-            DataConsumer dataConsumer = new DataConsumer(this.queue, this.configurationFlags);
+            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationTool);
 
             Thread consumer = new Thread(dataConsumer.consume);
 
