@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -17,14 +18,15 @@ namespace LaptopOrchestra.Kinect
         private Queue<IReadOnlyDictionary<JointType, Joint>> queue;
 
         /// <summary>
-        /// Flags to indidcate which data set to send to OSC
+        /// Configuration tool GUI to access selected flags
+        /// Should this only be an exposure to getJointList?
         /// </summary>
-        private ConfigurationFlags configurationFlags = new ConfigurationFlags();
+        private ConfigurationTool configurationTool;
 
-        public DataConsumer(Queue<IReadOnlyDictionary<JointType, Joint>> queue, ConfigurationFlags configurationFlags)
+        public DataConsumer(Queue<IReadOnlyDictionary<JointType, Joint>> queue, ConfigurationTool configurationTool)
         {
             this.queue = queue;
-            this.configurationFlags = configurationFlags;
+            this.configurationTool = configurationTool;
         }
 
         public void consume()
@@ -34,18 +36,19 @@ namespace LaptopOrchestra.Kinect
                 Console.WriteLine("Currently " + queue.Count + " in the queue");
                 if(this.queue.Count >= 1)
                 {
+                    // Pop the queue from the kinect
                     IReadOnlyDictionary<JointType, Joint> Joints = this.queue.Dequeue();
-                    
-                    var position = Joints[JointType.HandLeft].Position;
-                    if (configurationFlags.leftHand)
+                    // Check the list of joints to send (is this a reference or copy?)
+                    ObservableCollection<ListJoint> JointSendList = configurationTool.getJointList();
+                    foreach (var jt in JointSendList)
                     {
-                        Console.WriteLine("Left Hand: ({0}, {1}, {2})", position.X, position.Y, position.Z);
+                        if ( jt.send )
+                        {
+                            var position = Joints[jt.jointType].Position;
+                            Console.WriteLine("'{0}: ({1}, {2}, {3})", jt.jointType, position.X, position.Y, position.Z);
+                        }
                     }
-
-                    position = Joints[JointType.HandRight].Position;
-                    if (configurationFlags.rightHand) {
-                        Console.WriteLine("Right Hand: ({0}, {1}, {2})", position.X, position.Y, position.Z);
-                    }
+                    
                 }
                 else
                 {
