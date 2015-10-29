@@ -5,58 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaptopOrchestra.Kinect"
         mc:Ignorable="d"
-        Title="Kinect Simulator" Height="300" Width="600">
+        Title="Kinect Simulator" Height="600" Width="1200">
     <Grid>
-        <TextBlock Margin="211,25,178.333,224.667">Kinect Hand Movement Simulator</TextBlock>
-        <TextBlock Margin="122,125,414.333,124.667">Left Hand</TextBlock>
-        <Button Content="L"
-		    HorizontalAlignment="Left"
-		    Margin="33,127,0,0"
-		    VerticalAlignment="Top"
-		    Width="75"
-		    Click="LeftHandLeft"/>
-        <Button Content="R"
-        	HorizontalAlignment="Left"
-        	Margin="192,125,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="LeftHandRight"/>
-        <Button Content="U"
-        	HorizontalAlignment="Left"
-        	Margin="113,151,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="LeftHandUp"/>
-        <Button Content="D"
-        	HorizontalAlignment="Left"
-        	Margin="113,100,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="LeftHandDown"/>
-        <TextBlock Margin="421,126,111.333,123.667">Right Hand</TextBlock>
-        <Button Content="L"
-		    HorizontalAlignment="Left"
-		    Margin="330,125,0,0"
-		    VerticalAlignment="Top"
-		    Width="75"
-		    Click="LeftHandLeft"/>
-        <Button Content="R"
-        	HorizontalAlignment="Left"
-        	Margin="487,124,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="RightHandRight"/>
-        <Button Content="U"
-        	HorizontalAlignment="Left"
-        	Margin="412,151,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="RightHandUp"/>
-        <Button Content="D"
-        	HorizontalAlignment="Left"
-        	Margin="412,100,0,0"
-        	VerticalAlignment="Top"
-        	Width="75"
-        	Click="RightHandDown"/>
+        <TextBlock Margin="531,10,537.333,334.667" Text="Kinect Simulator Data"/>
+        <DataGrid x:Name="DataGrid" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Height="441" Width="1173" Loaded="dataGrid_Loaded"/>
+        <Button x:Name="flushToQueue" Content="Flush to Queue" HorizontalAlignment="Left" Margin="10,487,0,0" VerticalAlignment="Top" Width="1173" Click="flushToQueue_Click" Height="74"/>
     </Grid>
 </Window>
