@@ -26,11 +26,20 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         private ConfigurationTool configurationTool;
 
+        /// <summary>
+        /// Queue where the sensor will add data to
+        /// </summary>
+        private OscBuilder oscBuilder;
+
         public DataConsumer(Queue<IReadOnlyDictionary<JointType, Joint>> queue, ConfigurationTool configurationTool)
         {
             this.queue = queue;
 
             this.configurationTool = configurationTool;
+
+            this.oscBuilder = new OscBuilder();
+
+            UDP.ConfigureIpAndPort("127.0.0.1", 8000);
 
         }
 
@@ -50,7 +59,12 @@ namespace LaptopOrchestra.Kinect
                         if ( jt.send )
                         {
                             var position = Joints[jt.jointType].Position;
-                            Console.WriteLine("'{0}: ({1}, {2}, {3})", jt.jointType, position.X, position.Y, position.Z);
+
+                            var joint = oscBuilder.BuildJointMessage(Joints[jt.jointType]);
+
+                            UDP.SendMessage(joint);
+
+                            //Console.WriteLine("'{0}: ({1}, {2}, {3})", jt.jointType, position.X, position.Y, position.Z);
                         }
                     }
                 }

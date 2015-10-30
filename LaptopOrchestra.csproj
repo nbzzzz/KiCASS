@@ -103,6 +103,7 @@
     <Compile Include="KinectSimulator.xaml.cs">
       <DependentUpon>KinectSimulator.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OscBuilder.cs" />
     <Compile Include="UDP.cs" />
     <Page Include="ConfigurationTool.xaml">
       <SubType>Designer</SubType>
