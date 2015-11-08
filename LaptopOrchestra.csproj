@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{269A7B21-FBFE-4E7A-8BBE-C8DE2EC0D833}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LaptopOrchestra.Kinect</RootNamespace>
     <AssemblyName>LaptopOrchestra</AssemblyName>
@@ -93,12 +93,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BitmapHelper.cs" />
     <Compile Include="ConfigurationFlags.cs" />
     <Compile Include="ConfigurationTool.xaml.cs">
       <DependentUpon>ConfigurationTool.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataConsumer.cs" />
-    <Compile Include="KinectProcessor.cs" />
     <Compile Include="KinectSimulatorData.cs" />
     <Compile Include="KinectSimulator.xaml.cs">
       <DependentUpon>KinectSimulator.xaml</DependentUpon>

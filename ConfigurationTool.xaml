@@ -3,27 +3,27 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:LaptopOrchestra.Kinect"
-    Title="ConfigurationTool" Height="600" Width="600">
+    Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="600" Width="1112">
     <Window.Resources>
         <ObjectDataProvider x:Key="Joints" ObjectType="{x:Type local:DataClass}" MethodName="GetJoints"/>
         <CollectionViewSource x:Key="AllJoints" Source="{StaticResource Joints}" Filter="listFilter"/>
         <CollectionViewSource x:Key="SentJoints" Source="{StaticResource Joints}" Filter="sendFilter"/>
 
         <DataTemplate x:Key="JointDataTemplate"
-                      DataType="{x:Type local:ListJoint}">            
+                      DataType="{x:Type local:ListJoint}">
             <TextBlock Text="{Binding jointType}"/>
         </DataTemplate>
     </Window.Resources>
-    <Grid ShowGridLines="False"
-          >
+    <Grid ShowGridLines="False" Height="1000" Margin="2,0,-2,-431">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="11.333"/>
             <ColumnDefinition Width="14"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="712"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="550"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Margin="0,0,0,-0.333">
             <Label Name="lblLeftTitle" Content="{Binding LeftHeader, FallbackValue=Available}"/>
@@ -52,5 +52,11 @@
                   ItemsSource="{Binding Source={StaticResource SentJoints}}"
                   ItemTemplate="{StaticResource JointDataTemplate}"/>
         </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="6" Grid.RowSpan="6">
+            <Image x:Name="camera" Height="530" Margin="10,0,54,0" RenderTransformOrigin="1.022,0.825"/>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="6" Grid.RowSpan="6">
+        <Canvas x:Name="canvas" Height="546" RenderTransformOrigin="0.423,-0.982" Margin="10,0" />
+        </StackPanel>
     </Grid>
-</Window>    
+</Window>

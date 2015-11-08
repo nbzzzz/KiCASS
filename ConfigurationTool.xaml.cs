@@ -1,5 +1,6 @@
 ﻿using Microsoft.Kinect;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Data;
 using System.Windows.Input;
 using System;
@@ -7,6 +8,10 @@ using LaptopOrchestra.Kinect;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -51,7 +56,18 @@ namespace LaptopOrchestra.Kinect
     }
 
     public partial class ConfigurationTool : Window
-    {        
+    {
+        // BEGIN: KinectProcessor vars
+        Mode _mode = Mode.Color;
+
+        KinectSensor _sensor;
+        MultiSourceFrameReader _reader;
+        IList<Body> _bodies;
+        Queue<IDictionary<JointType, Joint>> queue;
+
+        bool _displayBody = false;
+        // END: KinectProcess vars
+
         public ICommand MoveRightCommand
         {
             get;
@@ -97,7 +113,7 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         /// Default constructor-- set up RelayCommands.
         /// </summary>
-        public ConfigurationTool()
+        public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue) // TODO: remove arg and place into KinectProcessor
         {
             LeftHeader = "Joints";
             RightHeader = "OSC Joints";
@@ -107,6 +123,9 @@ namespace LaptopOrchestra.Kinect
             MoveLeftCommand = new RelayCommand<ListJoint>((o) => OnMoveLeft(o), (o) => o != null);
             MoveAllRightCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllRight((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
             MoveAllLeftCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllLeft((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
+
+            this.queue = queue;
+            startKinect();
             InitializeComponent();
         }
 
@@ -187,7 +206,162 @@ namespace LaptopOrchestra.Kinect
             }
         }
 
+        // TODO: Start of KinectProcessor -- must be moved into its own class once GUI can be sorted
+
+        #region Event handlers
+
+        private void startKinect()
+        {
+            _sensor = KinectSensor.GetDefault();
+
+            if (_sensor != null)
+            {
+                _sensor.Open();
+
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+
+                _mode = Mode.Color;
+
+                _displayBody = true;
+
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            _sensor = KinectSensor.GetDefault();
+
+            if (_sensor != null)
+            {
+                _sensor.Open();
+
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (_reader != null)
+            {
+                _reader.Dispose();
+            }
+
+            if (_sensor != null)
+            {
+                _sensor.Close();
+            }
+        }
+
+        void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
+        {
+            var reference = e.FrameReference.AcquireFrame();
+
+            // Color
+            using (var frame = reference.ColorFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Color)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Depth
+            using (var frame = reference.DepthFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Depth)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Infrared
+            using (var frame = reference.InfraredFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Infrared)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Body
+            using (var frame = reference.BodyFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    canvas.Children.Clear();
+
+                    _bodies = new Body[frame.BodyFrameSource.BodyCount];
+
+                    frame.GetAndRefreshBodyData(_bodies);
+
+                    foreach (var body in _bodies)
+                    {
+                        if (body != null)
+                        {
+                            IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
+
+                            foreach (var joint in body.Joints)
+                            {
+                                newJoint.Add(joint.Value.JointType, joint.Value);
+                            }
+
+                            this.queue.Enqueue(newJoint);
+
+                            if (body.IsTracked)
+                            {
+                                // Draw skeleton.
+                                if (_displayBody)
+                                {
+                                    canvas.DrawSkeleton(body);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Color_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Color;
+        }
+
+        private void Depth_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Depth;
+        }
+
+        private void Infrared_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Infrared;
+        }
+
+        private void Body_Click(object sender, RoutedEventArgs e)
+        {
+            _displayBody = !_displayBody;
+        }
+
+        #endregion
     }
+
+    public enum Mode
+    {
+        Color,
+        Depth,
+        Infrared
+    }
+
 
     public class RelayCommand<T> : ICommand
     {
@@ -260,4 +434,5 @@ namespace LaptopOrchestra.Kinect
 
         #endregion
     }
+
 }
