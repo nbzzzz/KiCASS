@@ -3,9 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System;
-using LaptopOrchestra.Kinect;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace LaptopOrchestra.Kinect

@@ -1,24 +1,16 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="App.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Windows;
+using Microsoft.Kinect;
 
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 namespace LaptopOrchestra.Kinect
 {
-    using Microsoft.Kinect;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Threading;
-    using System.Windows;
-
     /// <summary>
     /// Interaction logic for App
     /// </summary>
     public partial class App : Application
     {
-
         /// <summary>
         /// Queue to communicate between Kinect Data Producer and Data Comsumer
         /// </summary>
@@ -31,8 +23,12 @@ namespace LaptopOrchestra.Kinect
         /// <param name="e">event arguments</param>
         void App_Startup(object sender, StartupEventArgs e)
         {
-            // Initialize our queue to pass data from Kinect Thread to Communications Thread
-            this.queue = new Queue<IReadOnlyDictionary<JointType, Joint>>();
+			// Initialize logger
+			log4net.Config.XmlConfigurator.Configure();
+			Logger.Debug("App Startup");
+
+			// Initialize our queue to pass data from Kinect Thread to Communications Thread
+			this.queue = new Queue<IReadOnlyDictionary<JointType, Joint>>();
 
 //            MainWindow mainWindow = new MainWindow(this.queue);
 //            mainWindow.Top = 200;
