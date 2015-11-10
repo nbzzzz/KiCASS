@@ -1,6 +1,7 @@
 ﻿using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
@@ -141,14 +142,9 @@ namespace LaptopOrchestra.Kinect
 
         #region Drawing
 
-        public static void DrawSkeleton(this Canvas canvas, Body body)
+        public static void DrawSkeleton(this Canvas canvas, Body body, ObservableCollection<ListJoint> Joints)
         {
             if (body == null) return;
-
-            foreach (Joint joint in body.Joints.Values)
-            {
-                canvas.DrawPoint(joint);
-            }
 
             canvas.DrawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
             canvas.DrawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
@@ -174,9 +170,22 @@ namespace LaptopOrchestra.Kinect
             canvas.DrawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
             canvas.DrawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
             canvas.DrawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
+
+            foreach (Joint joint in body.Joints.Values)
+            {
+                bool ifsend = Joints.First(x => x.jointType == joint.JointType).send;
+                if (ifsend)
+                {
+                    canvas.DrawPoint(joint, Colors.ForestGreen);
+                }
+                else
+                {
+                    canvas.DrawPoint(joint, Colors.LightSalmon);
+                }
+            }
         }
 
-        public static void DrawPoint(this Canvas canvas, Joint joint)
+        public static void DrawPoint(this Canvas canvas, Joint joint, Color color)
         {
             if (joint.TrackingState == TrackingState.NotTracked) return;
 
@@ -186,7 +195,9 @@ namespace LaptopOrchestra.Kinect
             {
                 Width = 20,
                 Height = 20,
-                Fill = new SolidColorBrush(Colors.LightBlue)
+                Fill = new SolidColorBrush(color),
+                Stroke = new SolidColorBrush(Colors.LightBlue),
+                StrokeThickness = 3
             };
 
             Canvas.SetLeft(ellipse, joint.Position.X - ellipse.Width / 2);

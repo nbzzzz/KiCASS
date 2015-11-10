@@ -307,7 +307,7 @@ namespace LaptopOrchestra.Kinect
 
                     foreach (var body in _bodies)
                     {
-                        if (body != null)
+                        if (body != null && body.IsTracked)
                         {
                             IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
 
@@ -323,7 +323,7 @@ namespace LaptopOrchestra.Kinect
                                 // Draw skeleton.
                                 if (_displayBody)
                                 {
-                                    canvas.DrawSkeleton(body);
+                                    canvas.DrawSkeleton(body, getJointList());
                                 }
                             }
                         }

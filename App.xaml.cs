@@ -34,6 +34,8 @@ namespace LaptopOrchestra.Kinect
             // Initialize our queue to pass data from Kinect Thread to Communications Thread
             this.queue = new Queue<IDictionary<JointType, Joint>>();
 
+
+
             // Initialize main GUI
             ConfigurationTool configurationTool = new ConfigurationTool(this.queue);
             configurationTool.Top = 200;
