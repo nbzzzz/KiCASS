@@ -23,7 +23,12 @@ namespace LaptopOrchestra.Kinect
         /// Queue to communicate between Kinect Data Producer and Data Comsumer
         /// </summary>
         private Queue<IDictionary<JointType,Joint>> queue = null;
-        
+
+        /// <summary>
+        /// Configuration Items selected
+        /// </summary>
+        Dictionary<JointType, bool> configurationFlags = null;
+
         /// <summary>
         /// Execute start up tasks
         /// </summary>
@@ -34,15 +39,13 @@ namespace LaptopOrchestra.Kinect
             // Initialize our queue to pass data from Kinect Thread to Communications Thread
             this.queue = new Queue<IDictionary<JointType, Joint>>();
 
-
+            configurationFlags = new Dictionary<JointType, bool>();
 
             // Initialize main GUI
-            ConfigurationTool configurationTool = new ConfigurationTool(this.queue);
+            ConfigurationTool configurationTool = new ConfigurationTool(this.queue, configurationFlags);
             configurationTool.Top = 200;
             configurationTool.Left = 500;
             configurationTool.Show();
-
-
 
             // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
             /*KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
@@ -50,7 +53,7 @@ namespace LaptopOrchestra.Kinect
             kinectSimulator.Left = 600;
             kinectSimulator.Show();*/
 
-            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationTool);
+            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationFlags);
 
             Thread consumer = new Thread(dataConsumer.consume);
 

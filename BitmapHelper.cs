@@ -142,7 +142,7 @@ namespace LaptopOrchestra.Kinect
 
         #region Drawing
 
-        public static void DrawSkeleton(this Canvas canvas, Body body, ObservableCollection<ListJoint> Joints)
+        public static void DrawSkeleton(this Canvas canvas, Body body, Dictionary<JointType, bool> configurationFlags)
         {
             if (body == null) return;
 
@@ -171,10 +171,11 @@ namespace LaptopOrchestra.Kinect
             canvas.DrawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
             canvas.DrawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
 
+            var JointSendList = configurationFlags.Where(x => x.Value == true).Select(cf => cf.Key);
+
             foreach (Joint joint in body.Joints.Values)
             {
-                bool ifsend = Joints.First(x => x.jointType == joint.JointType).send;
-                if (ifsend)
+                if (JointSendList.Any(x => x == joint.JointType))
                 {
                     canvas.DrawPoint(joint, Colors.ForestGreen);
                 }

@@ -15,45 +15,6 @@ using System.Windows.Shapes;
 
 namespace LaptopOrchestra.Kinect
 {
-    public class ListJoint
-    {        
-        public JointType jointType { get; set; }
-        public Boolean send { get; set; }
-    }
-    public class DataClass
-    {
-        private static ObservableCollection<ListJoint> _JointsCollection;
-
-        public DataClass()
-        {
-            _JointsCollection = new ObservableCollection<ListJoint>();
-        }
-
-        public ObservableCollection<ListJoint> JointsCollection
-        {
-            get { return _JointsCollection; }
-            set { _JointsCollection = value; }
-        }
-
-        public ObservableCollection<ListJoint> GetJoints()
-        {
-            var JointTypes = Enum.GetValues(typeof(JointType)).Cast<JointType>(); ;
-
-            foreach (var jt in JointTypes)
-            {
-
-                JointType jointType = new JointType();
-                jointType = jt;
-
-                ListJoint listJoint = new ListJoint();
-                listJoint.jointType = jointType;
-                listJoint.send = false;
-                JointsCollection.Add(listJoint);
-            }
-
-            return JointsCollection;
-        }
-    }
 
     public partial class ConfigurationTool : Window
     {
@@ -65,146 +26,68 @@ namespace LaptopOrchestra.Kinect
         IList<Body> _bodies;
         Queue<IDictionary<JointType, Joint>> queue;
 
+        Dictionary<JointType, bool> configurationFlags;
+
         bool _displayBody = false;
         // END: KinectProcess vars
-
-        public ICommand MoveRightCommand
-        {
-            get;
-            set;
-        }
-
-        public ICommand MoveLeftCommand
-        {
-            get;
-            set;
-        }
-
-        public ICommand MoveAllRightCommand
-        {
-            get;
-            set;
-        }
-
-        public ICommand MoveAllLeftCommand
-        {
-            get;
-            set;
-        }
-
-        public static DependencyProperty RightHeaderProperty =
-            DependencyProperty.Register("RightHeader", typeof(string), typeof(ConfigurationTool));
-
-        public string RightHeader
-        {
-            get { return (string)GetValue(RightHeaderProperty); }
-            set { SetValue(RightHeaderProperty, value); }
-        }
-
-        public static DependencyProperty LeftHeaderProperty =
-            DependencyProperty.Register("LeftHeader", typeof(string), typeof(ConfigurationTool));
-
-        public string LeftHeader
-        {
-            get { return (string)GetValue(LeftHeaderProperty); }
-            set { SetValue(LeftHeaderProperty, value); }
-        }
 
         /// <summary>
         /// Default constructor-- set up RelayCommands.
         /// </summary>
-        public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue) // TODO: remove arg and place into KinectProcessor
+        public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue, Dictionary<JointType, bool> configurationFlags) // TODO: remove arg and place into KinectProcessor
         {
-            LeftHeader = "Joints";
-            RightHeader = "OSC Joints";
+            InitializeComponent();
+            this.configurationFlags = configurationFlags;
 
+            var jointTypes = Enum.GetValues(typeof(JointType));
+
+            foreach (JointType jt in jointTypes) {
+                lvJoints.Items.Add(jt);
+                configurationFlags[jt] = false;
+            }
             
-            MoveRightCommand = new RelayCommand<ListJoint>((o) => OnMoveRight(o), (o) => o != null);
-            MoveLeftCommand = new RelayCommand<ListJoint>((o) => OnMoveLeft(o), (o) => o != null);
-            MoveAllRightCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllRight((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
-            MoveAllLeftCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllLeft((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
-
             this.queue = queue;
             startKinect();
-            InitializeComponent();
+
         }
 
-        public ObservableCollection<ListJoint> getJointList()
+        private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ObjectDataProvider resource = (ObjectDataProvider)this.Resources["Joints"];
-
-            return (ObservableCollection<ListJoint>)resource.Data;
-            
-        }
-
-        /// <summary>
-        /// Make this selected joint sent
-        /// </summary>
-        private void OnMoveRight(ListJoint joint)
-        {
-            joint.send = true;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make this selected joint not send.
-        /// </summary>
-        private void OnMoveLeft(ListJoint joint)
-        {
-            joint.send = false;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make all Joints send
-        /// </summary>
-        private void OnMoveAllRight(ListCollectionView joints)
-        {
-            foreach (ListJoint j in joints.SourceCollection)
-                j.send = true;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make all joints not send
-        /// </summary>
-        private void OnMoveAllLeft(ListCollectionView joints)
-        {
-            foreach (ListJoint j in joints.SourceCollection)
-                j.send = false;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Filters out any non sending joints
-        /// </summary>
-        private void sendFilter(object sender, FilterEventArgs e)
-        {
-            ListJoint joint = e.Item as ListJoint;
-            e.Accepted = joint.send == true;
-        }
-
-        /// <summary>
-        /// Filter to list all joints
-        /// </summary>
-        private void listFilter(object sender, FilterEventArgs e)
-        {
-            ListJoint joint = e.Item as ListJoint;
-            e.Accepted = joint.send == false;
-        }
-
-        /// <summary>
-        /// Refresh the collection view sources.
-        /// </summary>
-        private void RefreshViews()
-        {
-            foreach (object resource in Resources.Values)
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
             {
-                CollectionViewSource cvs = resource as CollectionViewSource;
-                if (cvs != null)
-                    cvs.View.Refresh();
+                configurationFlags[jt] = false;
             }
+
+            foreach ( var item in lvJoints.SelectedItems)
+            {
+                JointType jt = (JointType)Enum.Parse(typeof(JointType), item.ToString(), true);
+                configurationFlags[jt] = true;
+            }
+
         }
+
+        private void btnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                configurationFlags[jt] = true;
+            }
+            lvJoints.SelectAll();
+        }
+
+        private void btnClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                configurationFlags[jt] = false;
+            }
+            lvJoints.UnselectAll();
+        }
+
+
 
         // TODO: Start of KinectProcessor -- must be moved into its own class once GUI can be sorted
 
@@ -323,7 +206,7 @@ namespace LaptopOrchestra.Kinect
                                 // Draw skeleton.
                                 if (_displayBody)
                                 {
-                                    canvas.DrawSkeleton(body, getJointList());
+                                    canvas.DrawSkeleton(body, configurationFlags);
                                 }
                             }
                         }
@@ -353,6 +236,19 @@ namespace LaptopOrchestra.Kinect
         }
 
         #endregion
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
+            var ip = IP.Text;
+            try {
+                var port = int.Parse(Port.Text);
+                UDP.ConfigureIpAndPort(ip, port);
+            }
+            catch
+            {
+
+            }
+        }
     }
 
     public enum Mode
