@@ -15,9 +15,9 @@ namespace LaptopOrchestra.Kinect
         private IList<Body> _bodies;
 
 
-        Queue<IDictionary<JointType, Joint>> queue;
+        private readonly Queue<IDictionary<JointType, Joint>> _queue;
 
-        Dictionary<JointType, bool> configurationFlags;
+        private readonly Dictionary<JointType, bool> _configurationFlags;
 
         bool _displayBody = false;
         // END: KinectProcess vars
@@ -25,16 +25,16 @@ namespace LaptopOrchestra.Kinect
         public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue, Dictionary<JointType, bool> configurationFlags) // TODO: remove arg and place into KinectProcessor
         {
             InitializeComponent();
-            this.configurationFlags = configurationFlags;
+
+            _configurationFlags = configurationFlags;
+            _queue = queue;
 
             var jointTypes = Enum.GetValues(typeof(JointType));
-
             foreach (JointType jt in jointTypes) {
                 lvJoints.Items.Add(jt);
                 configurationFlags[jt] = false;
            } 
-            
-            this.queue = queue;
+           
             StartKinect();
 
         }
@@ -46,13 +46,13 @@ namespace LaptopOrchestra.Kinect
             var jointTypes = Enum.GetValues(typeof(JointType));
             foreach (JointType jt in jointTypes)
             {
-                configurationFlags[jt] = false;
+                _configurationFlags[jt] = false;
             }
 
             foreach ( var item in lvJoints.SelectedItems)
             {
                 JointType jt = (JointType)Enum.Parse(typeof(JointType), item.ToString(), true);
-                configurationFlags[jt] = true;
+                _configurationFlags[jt] = true;
             }
 
         }
@@ -62,7 +62,7 @@ namespace LaptopOrchestra.Kinect
             var jointTypes = Enum.GetValues(typeof(JointType));
             foreach (JointType jt in jointTypes)
             {
-                configurationFlags[jt] = true;
+                _configurationFlags[jt] = true;
             }
             lvJoints.SelectAll();
         }
@@ -72,7 +72,7 @@ namespace LaptopOrchestra.Kinect
             var jointTypes = Enum.GetValues(typeof(JointType));
             foreach (JointType jt in jointTypes)
             {
-                configurationFlags[jt] = false;
+                _configurationFlags[jt] = false;
             }
             lvJoints.UnselectAll();
         }
@@ -95,8 +95,6 @@ namespace LaptopOrchestra.Kinect
 
         // TODO: Start of KinectProcessor -- must be moved into its own class once GUI can be sorted
 
-        #region Event handlers
-
         private void StartKinect()
         {
             _sensor = KinectSensor.GetDefault();
@@ -109,6 +107,9 @@ namespace LaptopOrchestra.Kinect
 
             _displayBody = true;
         }
+
+
+        #region Event handlers
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -163,14 +164,14 @@ namespace LaptopOrchestra.Kinect
                         newJoint.Add(joint.Value.JointType, joint.Value);
                     }
 
-                    this.queue.Enqueue(newJoint);
+                    _queue.Enqueue(newJoint);
 
                     if (!body.IsTracked) continue;
 
                     // Draw skeleton.
                     if (_displayBody)
                     {
-                        canvas.DrawSkeleton(body, configurationFlags);
+                        canvas.DrawSkeleton(body, _configurationFlags);
                     }
                 }
             }
