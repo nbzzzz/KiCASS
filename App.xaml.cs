@@ -57,7 +57,7 @@ namespace LaptopOrchestra.Kinect
 
             DataConsumer dataConsumer = new DataConsumer(this.queue, configurationFlags);
 
-            Thread consumer = new Thread(dataConsumer.consume);
+            Thread consumer = new Thread(dataConsumer.Consume);
 
             consumer.Start();
         }
