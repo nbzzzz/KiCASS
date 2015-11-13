@@ -20,12 +20,12 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         /// Queue to communicate between Kinect Data Producer and Data Comsumer
         /// </summary>
-        private Queue<IDictionary<JointType,Joint>> queue = null;
+        public Queue<IDictionary<JointType,Joint>> queue = null;
 
         /// <summary>
         /// Configuration Items selected
         /// </summary>
-        Dictionary<JointType, bool> configurationFlags = null;
+        public Dictionary<JointType, bool> ConfigurationFlags = null;
 
         /// <summary>
         /// Execute start up tasks
@@ -39,14 +39,16 @@ namespace LaptopOrchestra.Kinect
 			Logger.Debug("App Startup");
 
 			// Initialize our queue to pass data from Kinect Thread to Communications Thread
-			this.queue = new Queue<IDictionary<JointType, Joint>>();
+			queue = new Queue<IDictionary<JointType, Joint>>();
 
-            configurationFlags = new Dictionary<JointType, bool>();
+            ConfigurationFlags = new Dictionary<JointType, bool>();
 
             // Initialize main GUI
-            ConfigurationTool configurationTool = new ConfigurationTool(this.queue, configurationFlags);
-            configurationTool.Top = 200;
-            configurationTool.Left = 500;
+            var configurationTool = new ConfigurationTool(this.queue, ConfigurationFlags)
+            {
+                Top = 200,
+                Left = 500
+            };
             configurationTool.Show();
 
             // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
@@ -55,9 +57,8 @@ namespace LaptopOrchestra.Kinect
             kinectSimulator.Left = 600;
             kinectSimulator.Show();*/
 
-            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationFlags);
-
-            Thread consumer = new Thread(dataConsumer.Consume);
+            var dataConsumer = new DataConsumer(this.queue, ConfigurationFlags);
+            var consumer = new Thread(dataConsumer.Consume);
 
             consumer.Start();
         }

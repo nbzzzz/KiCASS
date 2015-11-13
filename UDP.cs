@@ -4,9 +4,20 @@ using Rug.Osc;
 
 public static class UDP
 {
-	private static int _connectPort;
-	private static IPAddress _userIP;
-	private static OscSender _sender;
+    /// <summary>
+    /// Port data will be streamed to
+    /// </summary>
+    private static int _connectPort;
+
+    /// <summary>
+    /// IP Address data will be streamed to
+    /// </summary>
+    private static IPAddress _userIP;
+
+    /// <summary>
+    /// Object that will send OSC Packets through UDP
+    /// </summary>
+    private static OscSender _sender;
 
 	public static void StartDataOut()
 	{
@@ -18,6 +29,7 @@ public static class UDP
 		catch (Exception e)
 		{
 			Console.WriteLine(e.ToString());
+            Logger.Debug(e.Message);
 		}
 	}
 

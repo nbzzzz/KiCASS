@@ -18,26 +18,26 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         /// Queue to communicate between Kinect Simulator and Data Comsumer
         /// </summary>
-        private Queue<IReadOnlyDictionary<JointType, Joint>> queue = null;
+        private readonly Queue<IReadOnlyDictionary<JointType, Joint>> _queue;
 
         /// <summary>
         /// List of kinect simulator data
         /// </summary>
-        public List<KinectSimulatorData> simulatorDataList = null;
+        private readonly List<KinectSimulatorData> _simulatorDataList;
 
         public KinectSimulator(Queue<IReadOnlyDictionary<JointType, Joint>> queue)
         {
-            // Set the communication queue
-            this.queue = queue;
+            // Set the communication _queue
+            this._queue = queue;
 
             // Initialize our simulate data list
-            simulatorDataList = new List<KinectSimulatorData>();
+            _simulatorDataList = new List<KinectSimulatorData>();
 
             // Parse our Kinect Simulator Data csv 
             string[] allLines = File.ReadAllLines(@"SimulatorData\shoot.csv");
 
             foreach (var line in allLines){
-                simulatorDataList.Add(new KinectSimulatorData(line.Split(' ')));
+                _simulatorDataList.Add(new KinectSimulatorData(line.Split(' ')));
             }
 
             InitializeComponent();
@@ -46,14 +46,13 @@ namespace LaptopOrchestra.Kinect
         private void dataGrid_Loaded(object sender, RoutedEventArgs e)
         {
             var grid = sender as DataGrid;
-            grid.ItemsSource = simulatorDataList;
-
+            if (grid != null) grid.ItemsSource = _simulatorDataList;
         }
 
         private void flushToQueue_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var simulatorData in simulatorDataList){
-                queue.Enqueue(simulatorData.toKinectData());
+            foreach (var simulatorData in _simulatorDataList){
+                _queue.Enqueue(simulatorData.toKinectData());
             }
         }
 

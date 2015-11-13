@@ -10,17 +10,31 @@ namespace LaptopOrchestra.Kinect
 
     public partial class ConfigurationTool : Window
     {
+        /// <summary>
+        /// Microsoft Kinect 2.0 sensor 
+        /// </summary>
         private KinectSensor _sensor;
+
+        /// <summary>
+        /// Reader that will interprate data comming from Kinect
+        /// </summary>
         private MultiSourceFrameReader _reader;
+
+        /// <summary>
+        /// List of bodies
+        /// </summary>
         private IList<Body> _bodies;
 
-
+        /// <summary>
+        /// Queue where the sensor will add data to
+        /// </summary>
         private readonly Queue<IDictionary<JointType, Joint>> _queue;
 
+        /// <summary>
+        /// Configuration Items selected
+        /// </summary>
         private readonly Dictionary<JointType, bool> _configurationFlags;
 
-        bool _displayBody = false;
-        // END: KinectProcess vars
 
         public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue, Dictionary<JointType, bool> configurationFlags) // TODO: remove arg and place into KinectProcessor
         {
@@ -36,7 +50,6 @@ namespace LaptopOrchestra.Kinect
            } 
            
             StartKinect();
-
         }
 
         #region UI Event Listeners
@@ -105,7 +118,6 @@ namespace LaptopOrchestra.Kinect
             _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
             _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
 
-            _displayBody = true;
         }
 
 
@@ -169,10 +181,7 @@ namespace LaptopOrchestra.Kinect
                     if (!body.IsTracked) continue;
 
                     // Draw skeleton.
-                    if (_displayBody)
-                    {
-                        canvas.DrawSkeleton(body, _configurationFlags);
-                    }
+                    canvas.DrawSkeleton(body, _configurationFlags);
                 }
             }
         }
