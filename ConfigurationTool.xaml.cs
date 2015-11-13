@@ -10,9 +10,6 @@ namespace LaptopOrchestra.Kinect
 
     public partial class ConfigurationTool : Window
     {
-        // BEGIN: KinectProcessor vars
-        Mode _mode = Mode.Color;
-
         KinectSensor _sensor;
         MultiSourceFrameReader _reader;
         IList<Body> _bodies;
@@ -23,9 +20,6 @@ namespace LaptopOrchestra.Kinect
         bool _displayBody = false;
         // END: KinectProcess vars
 
-        /// <summary>
-        /// Default constructor-- set up RelayCommands.
-        /// </summary>
         public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue, Dictionary<JointType, bool> configurationFlags) // TODO: remove arg and place into KinectProcessor
         {
             InitializeComponent();
@@ -42,6 +36,8 @@ namespace LaptopOrchestra.Kinect
             startKinect();
 
         }
+
+        #region UI Event Listeners
 
         private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -79,6 +75,20 @@ namespace LaptopOrchestra.Kinect
             lvJoints.UnselectAll();
         }
 
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
+            var ip = IP.Text;
+            try {
+                var port = int.Parse(Port.Text);
+                UDP.ConfigureIpAndPort(ip, port);
+            }
+            catch
+            {
+
+            }
+        }
+
+        #endregion
 
 
         // TODO: Start of KinectProcessor -- must be moved into its own class once GUI can be sorted
@@ -93,10 +103,8 @@ namespace LaptopOrchestra.Kinect
             {
                 _sensor.Open();
 
-                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
                 _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
-
-                _mode = Mode.Color;
 
                 _displayBody = true;
 
@@ -111,7 +119,7 @@ namespace LaptopOrchestra.Kinect
             {
                 _sensor.Open();
 
-                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
                 _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
             }
         }
@@ -133,43 +141,16 @@ namespace LaptopOrchestra.Kinect
         {
             var reference = e.FrameReference.AcquireFrame();
 
-            // Color
+            // Draw the Image from the camera
             using (var frame = reference.ColorFrameReference.AcquireFrame())
             {
                 if (frame != null)
                 {
-                    if (_mode == Mode.Color)
-                    {
-                        camera.Source = frame.ToBitmap();
-                    }
+                    camera.Source = frame.ToBitmap();
                 }
             }
 
-            // Depth
-            using (var frame = reference.DepthFrameReference.AcquireFrame())
-            {
-                if (frame != null)
-                {
-                    if (_mode == Mode.Depth)
-                    {
-                        camera.Source = frame.ToBitmap();
-                    }
-                }
-            }
-
-            // Infrared
-            using (var frame = reference.InfraredFrameReference.AcquireFrame())
-            {
-                if (frame != null)
-                {
-                    if (_mode == Mode.Infrared)
-                    {
-                        camera.Source = frame.ToBitmap();
-                    }
-                }
-            }
-
-            // Body
+            // Acquire skeleton data as well
             using (var frame = reference.BodyFrameReference.AcquireFrame())
             {
                 if (frame != null)
@@ -207,120 +188,6 @@ namespace LaptopOrchestra.Kinect
             }
         }
 
-        private void Color_Click(object sender, RoutedEventArgs e)
-        {
-            _mode = Mode.Color;
-        }
-
-        private void Depth_Click(object sender, RoutedEventArgs e)
-        {
-            _mode = Mode.Depth;
-        }
-
-        private void Infrared_Click(object sender, RoutedEventArgs e)
-        {
-            _mode = Mode.Infrared;
-        }
-
-        private void Body_Click(object sender, RoutedEventArgs e)
-        {
-            _displayBody = !_displayBody;
-        }
-
-        #endregion
-
-        private void Start_Click(object sender, RoutedEventArgs e)
-        {
-            var ip = IP.Text;
-            try {
-                var port = int.Parse(Port.Text);
-                UDP.ConfigureIpAndPort(ip, port);
-            }
-            catch
-            {
-
-            }
-        }
-    }
-
-    public enum Mode
-    {
-        Color,
-        Depth,
-        Infrared
-    }
-
-
-    public class RelayCommand<T> : ICommand
-    {
-        #region Fields
-
-        readonly Action<T> _execute = null;
-        readonly Predicate<T> _canExecute = null;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="DelegateCommand{T}"/>.
-        /// </summary>
-        /// <param name="execute">Delegate to execute when Execute is called on the command.  This can be null to just hook up a CanExecute delegate.</param>
-        /// <remarks><seealso cref="CanExecute"/> will always return true.</remarks>
-        public RelayCommand(Action<T> execute)
-            : this(execute, null)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new command.
-        /// </summary>
-        /// <param name="execute">The execution logic.</param>
-        /// <param name="canExecute">The execution status logic.</param>
-        public RelayCommand(Action<T> execute, Predicate<T> canExecute)
-        {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        #endregion
-
-        #region ICommand Members
-
-        ///<summary>
-        ///Defines the method that determines whether the command can execute in its current state.
-        ///</summary>
-        ///<param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
-        ///<returns>
-        ///true if this command can be executed; otherwise, false.
-        ///</returns>
-        public bool CanExecute(object parameter)
-        {
-            return _canExecute == null ? true : _canExecute((T)parameter);
-        }
-
-        ///<summary>
-        ///Occurs when changes occur that affect whether or not the command should execute.
-        ///</summary>
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        ///<summary>
-        ///Defines the method to be called when the command is invoked.
-        ///</summary>
-        ///<param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to <see langword="null" />.</param>
-        public void Execute(object parameter)
-        {
-            _execute((T)parameter);
-        }
-
         #endregion
     }
-
 }
