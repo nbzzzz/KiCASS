@@ -1,191 +1,255 @@
-﻿using Microsoft.Kinect;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Collections.Generic;
+using System.Windows.Controls;
+using Microsoft.Kinect;
 
 namespace LaptopOrchestra.Kinect
 {
-    public class ListJoint
-    {        
-        public JointType jointType { get; set; }
-        public Boolean send { get; set; }
-    }
-    public class DataClass
-    {
-        private static ObservableCollection<ListJoint> _JointsCollection;
-
-        public DataClass()
-        {
-            _JointsCollection = new ObservableCollection<ListJoint>();
-        }
-
-        public ObservableCollection<ListJoint> JointsCollection
-        {
-            get { return _JointsCollection; }
-            set { _JointsCollection = value; }
-        }
-
-        public ObservableCollection<ListJoint> GetJoints()
-        {
-            var JointTypes = Enum.GetValues(typeof(JointType)).Cast<JointType>(); ;
-
-            foreach (var jt in JointTypes)
-            {
-
-                JointType jointType = new JointType();
-                jointType = jt;
-
-                ListJoint listJoint = new ListJoint();
-                listJoint.jointType = jointType;
-                listJoint.send = false;
-                JointsCollection.Add(listJoint);
-            }
-
-            return JointsCollection;
-        }
-    }
 
     public partial class ConfigurationTool : Window
-    {        
-        public ICommand MoveRightCommand
-        {
-            get;
-            set;
-        }
+    {
+        // BEGIN: KinectProcessor vars
+        Mode _mode = Mode.Color;
 
-        public ICommand MoveLeftCommand
-        {
-            get;
-            set;
-        }
+        KinectSensor _sensor;
+        MultiSourceFrameReader _reader;
+        IList<Body> _bodies;
+        Queue<IDictionary<JointType, Joint>> queue;
 
-        public ICommand MoveAllRightCommand
-        {
-            get;
-            set;
-        }
+        Dictionary<JointType, bool> configurationFlags;
 
-        public ICommand MoveAllLeftCommand
-        {
-            get;
-            set;
-        }
-
-        public static DependencyProperty RightHeaderProperty =
-            DependencyProperty.Register("RightHeader", typeof(string), typeof(ConfigurationTool));
-
-        public string RightHeader
-        {
-            get { return (string)GetValue(RightHeaderProperty); }
-            set { SetValue(RightHeaderProperty, value); }
-        }
-
-        public static DependencyProperty LeftHeaderProperty =
-            DependencyProperty.Register("LeftHeader", typeof(string), typeof(ConfigurationTool));
-
-        public string LeftHeader
-        {
-            get { return (string)GetValue(LeftHeaderProperty); }
-            set { SetValue(LeftHeaderProperty, value); }
-        }
+        bool _displayBody = false;
+        // END: KinectProcess vars
 
         /// <summary>
         /// Default constructor-- set up RelayCommands.
         /// </summary>
-        public ConfigurationTool()
+        public ConfigurationTool(Queue<IDictionary<JointType, Joint>> queue, Dictionary<JointType, bool> configurationFlags) // TODO: remove arg and place into KinectProcessor
         {
-            LeftHeader = "Joints";
-            RightHeader = "OSC Joints";
-
-            
-            MoveRightCommand = new RelayCommand<ListJoint>((o) => OnMoveRight(o), (o) => o != null);
-            MoveLeftCommand = new RelayCommand<ListJoint>((o) => OnMoveLeft(o), (o) => o != null);
-            MoveAllRightCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllRight((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
-            MoveAllLeftCommand = new RelayCommand<ListCollectionView>((o) => OnMoveAllLeft((ListCollectionView)o), (o) => ((ListCollectionView)o).Count > 0);
             InitializeComponent();
-        }
+            this.configurationFlags = configurationFlags;
 
-        public ObservableCollection<ListJoint> getJointList()
-        {
-            ObjectDataProvider resource = (ObjectDataProvider)this.Resources["Joints"];
+            var jointTypes = Enum.GetValues(typeof(JointType));
 
-            return (ObservableCollection<ListJoint>)resource.Data;
+            foreach (JointType jt in jointTypes) {
+                lvJoints.Items.Add(jt);
+                configurationFlags[jt] = false;
+            }
             
+            this.queue = queue;
+            startKinect();
+
         }
 
-        /// <summary>
-        /// Make this selected joint sent
-        /// </summary>
-        private void OnMoveRight(ListJoint joint)
+        private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            joint.send = true;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make this selected joint not send.
-        /// </summary>
-        private void OnMoveLeft(ListJoint joint)
-        {
-            joint.send = false;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make all Joints send
-        /// </summary>
-        private void OnMoveAllRight(ListCollectionView joints)
-        {
-            foreach (ListJoint j in joints.SourceCollection)
-                j.send = true;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Make all joints not send
-        /// </summary>
-        private void OnMoveAllLeft(ListCollectionView joints)
-        {
-            foreach (ListJoint j in joints.SourceCollection)
-                j.send = false;
-            RefreshViews();
-        }
-
-        /// <summary>
-        /// Filters out any non sending joints
-        /// </summary>
-        private void sendFilter(object sender, FilterEventArgs e)
-        {
-            ListJoint joint = e.Item as ListJoint;
-            e.Accepted = joint.send == true;
-        }
-
-        /// <summary>
-        /// Filter to list all joints
-        /// </summary>
-        private void listFilter(object sender, FilterEventArgs e)
-        {
-            ListJoint joint = e.Item as ListJoint;
-            e.Accepted = joint.send == false;
-        }
-
-        /// <summary>
-        /// Refresh the collection view sources.
-        /// </summary>
-        private void RefreshViews()
-        {
-            foreach (object resource in Resources.Values)
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
             {
-                CollectionViewSource cvs = resource as CollectionViewSource;
-                if (cvs != null)
-                    cvs.View.Refresh();
+                configurationFlags[jt] = false;
+            }
+
+            foreach ( var item in lvJoints.SelectedItems)
+            {
+                JointType jt = (JointType)Enum.Parse(typeof(JointType), item.ToString(), true);
+                configurationFlags[jt] = true;
+            }
+
+        }
+
+        private void btnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                configurationFlags[jt] = true;
+            }
+            lvJoints.SelectAll();
+        }
+
+        private void btnClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                configurationFlags[jt] = false;
+            }
+            lvJoints.UnselectAll();
+        }
+
+
+
+        // TODO: Start of KinectProcessor -- must be moved into its own class once GUI can be sorted
+
+        #region Event handlers
+
+        private void startKinect()
+        {
+            _sensor = KinectSensor.GetDefault();
+
+            if (_sensor != null)
+            {
+                _sensor.Open();
+
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+
+                _mode = Mode.Color;
+
+                _displayBody = true;
+
             }
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            _sensor = KinectSensor.GetDefault();
+
+            if (_sensor != null)
+            {
+                _sensor.Open();
+
+                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (_reader != null)
+            {
+                _reader.Dispose();
+            }
+
+            if (_sensor != null)
+            {
+                _sensor.Close();
+            }
+        }
+
+        void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
+        {
+            var reference = e.FrameReference.AcquireFrame();
+
+            // Color
+            using (var frame = reference.ColorFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Color)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Depth
+            using (var frame = reference.DepthFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Depth)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Infrared
+            using (var frame = reference.InfraredFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    if (_mode == Mode.Infrared)
+                    {
+                        camera.Source = frame.ToBitmap();
+                    }
+                }
+            }
+
+            // Body
+            using (var frame = reference.BodyFrameReference.AcquireFrame())
+            {
+                if (frame != null)
+                {
+                    canvas.Children.Clear();
+
+                    _bodies = new Body[frame.BodyFrameSource.BodyCount];
+
+                    frame.GetAndRefreshBodyData(_bodies);
+
+                    foreach (var body in _bodies)
+                    {
+                        if (body != null && body.IsTracked)
+                        {
+                            IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
+
+                            foreach (var joint in body.Joints)
+                            {
+                                newJoint.Add(joint.Value.JointType, joint.Value);
+                            }
+
+                            this.queue.Enqueue(newJoint);
+
+                            if (body.IsTracked)
+                            {
+                                // Draw skeleton.
+                                if (_displayBody)
+                                {
+                                    canvas.DrawSkeleton(body, configurationFlags);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Color_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Color;
+        }
+
+        private void Depth_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Depth;
+        }
+
+        private void Infrared_Click(object sender, RoutedEventArgs e)
+        {
+            _mode = Mode.Infrared;
+        }
+
+        private void Body_Click(object sender, RoutedEventArgs e)
+        {
+            _displayBody = !_displayBody;
+        }
+
+        #endregion
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
+            var ip = IP.Text;
+            try {
+                var port = int.Parse(Port.Text);
+                UDP.ConfigureIpAndPort(ip, port);
+            }
+            catch
+            {
+
+            }
+        }
     }
+
+    public enum Mode
+    {
+        Color,
+        Depth,
+        Infrared
+    }
+
 
     public class RelayCommand<T> : ICommand
     {
@@ -258,4 +322,5 @@ namespace LaptopOrchestra.Kinect
 
         #endregion
     }
+
 }

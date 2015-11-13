@@ -32,8 +32,15 @@ public static class UDP
 		{
 			StopDataOut();
 		}
-		_connectPort = port;
-		_userIP = IPAddress.Parse(ip);
+        try {
+            _userIP = IPAddress.Parse(ip);
+            _connectPort = port;
+        }
+        catch
+        {
+            Console.WriteLine("INVALID IP or PORT");
+        }
+
 		StartDataOut();
 	}
 

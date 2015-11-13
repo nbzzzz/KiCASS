@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿//------------------------------------------------------------------------------
+// <copyright file="App.xaml.cs" company="Microsoft">
+//     Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+//------------------------------------------------------------------------------
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using Microsoft.Kinect;
@@ -11,11 +16,17 @@ namespace LaptopOrchestra.Kinect
     /// </summary>
     public partial class App : Application
     {
+
         /// <summary>
         /// Queue to communicate between Kinect Data Producer and Data Comsumer
         /// </summary>
-        private Queue<IReadOnlyDictionary<JointType,Joint>> queue = null;
-        
+        private Queue<IDictionary<JointType,Joint>> queue = null;
+
+        /// <summary>
+        /// Configuration Items selected
+        /// </summary>
+        Dictionary<JointType, bool> configurationFlags = null;
+
         /// <summary>
         /// Execute start up tasks
         /// </summary>
@@ -28,25 +39,23 @@ namespace LaptopOrchestra.Kinect
 			Logger.Debug("App Startup");
 
 			// Initialize our queue to pass data from Kinect Thread to Communications Thread
-			this.queue = new Queue<IReadOnlyDictionary<JointType, Joint>>();
+			this.queue = new Queue<IDictionary<JointType, Joint>>();
 
-//            MainWindow mainWindow = new MainWindow(this.queue);
-//            mainWindow.Top = 200;
-//            mainWindow.Left = 500;
-//            mainWindow.Show();
+            configurationFlags = new Dictionary<JointType, bool>();
 
-            ConfigurationTool configurationTool = new ConfigurationTool();
+            // Initialize main GUI
+            ConfigurationTool configurationTool = new ConfigurationTool(this.queue, configurationFlags);
             configurationTool.Top = 200;
             configurationTool.Left = 500;
             configurationTool.Show();
-            
 
-            KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
+            // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
+            /*KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
             kinectSimulator.Top = 200;
             kinectSimulator.Left = 600;
-            kinectSimulator.Show();
+            kinectSimulator.Show();*/
 
-            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationTool);
+            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationFlags);
 
             Thread consumer = new Thread(dataConsumer.consume);
 
