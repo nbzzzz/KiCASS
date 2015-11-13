@@ -10,9 +10,11 @@ namespace LaptopOrchestra.Kinect
 
     public partial class ConfigurationTool : Window
     {
-        KinectSensor _sensor;
-        MultiSourceFrameReader _reader;
-        IList<Body> _bodies;
+        private KinectSensor _sensor;
+        private MultiSourceFrameReader _reader;
+        private IList<Body> _bodies;
+
+
         Queue<IDictionary<JointType, Joint>> queue;
 
         Dictionary<JointType, bool> configurationFlags;
@@ -30,10 +32,10 @@ namespace LaptopOrchestra.Kinect
             foreach (JointType jt in jointTypes) {
                 lvJoints.Items.Add(jt);
                 configurationFlags[jt] = false;
-            }
+           } 
             
             this.queue = queue;
-            startKinect();
+            StartKinect();
 
         }
 
@@ -84,7 +86,7 @@ namespace LaptopOrchestra.Kinect
             }
             catch
             {
-
+                // ignored
             }
         }
 
@@ -95,49 +97,38 @@ namespace LaptopOrchestra.Kinect
 
         #region Event handlers
 
-        private void startKinect()
+        private void StartKinect()
         {
             _sensor = KinectSensor.GetDefault();
 
-            if (_sensor != null)
-            {
-                _sensor.Open();
+            if (_sensor == null) return;
+            _sensor.Open();
 
-                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+            _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+            _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
 
-                _displayBody = true;
-
-            }
+            _displayBody = true;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _sensor = KinectSensor.GetDefault();
 
-            if (_sensor != null)
-            {
-                _sensor.Open();
+            if (_sensor == null) return;
+            _sensor.Open();
 
-                _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-                _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
-            }
+            _reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+            _reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (_reader != null)
-            {
-                _reader.Dispose();
-            }
+            _reader?.Dispose();
 
-            if (_sensor != null)
-            {
-                _sensor.Close();
-            }
+            _sensor?.Close();
         }
 
-        void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
+        private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             var reference = e.FrameReference.AcquireFrame();
 
@@ -153,36 +144,33 @@ namespace LaptopOrchestra.Kinect
             // Acquire skeleton data as well
             using (var frame = reference.BodyFrameReference.AcquireFrame())
             {
-                if (frame != null)
+                if (frame == null) return;
+
+                canvas.Children.Clear();
+
+                _bodies = new Body[frame.BodyFrameSource.BodyCount];
+
+                frame.GetAndRefreshBodyData(_bodies);
+
+                foreach (var body in _bodies)
                 {
-                    canvas.Children.Clear();
+                    if (body == null || !body.IsTracked) continue;
 
-                    _bodies = new Body[frame.BodyFrameSource.BodyCount];
+                    IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
 
-                    frame.GetAndRefreshBodyData(_bodies);
-
-                    foreach (var body in _bodies)
+                    foreach (var joint in body.Joints)
                     {
-                        if (body != null && body.IsTracked)
-                        {
-                            IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
+                        newJoint.Add(joint.Value.JointType, joint.Value);
+                    }
 
-                            foreach (var joint in body.Joints)
-                            {
-                                newJoint.Add(joint.Value.JointType, joint.Value);
-                            }
+                    this.queue.Enqueue(newJoint);
 
-                            this.queue.Enqueue(newJoint);
+                    if (!body.IsTracked) continue;
 
-                            if (body.IsTracked)
-                            {
-                                // Draw skeleton.
-                                if (_displayBody)
-                                {
-                                    canvas.DrawSkeleton(body, configurationFlags);
-                                }
-                            }
-                        }
+                    // Draw skeleton.
+                    if (_displayBody)
+                    {
+                        canvas.DrawSkeleton(body, configurationFlags);
                     }
                 }
             }
