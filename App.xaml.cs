@@ -4,7 +4,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows;
 using Microsoft.Kinect;
 
@@ -16,12 +15,6 @@ namespace LaptopOrchestra.Kinect
     /// </summary>
     public partial class App : Application
     {
-
-        /// <summary>
-        /// Queue to communicate between Kinect Data Producer and Data Comsumer
-        /// </summary>
-        public Queue<IDictionary<JointType,Joint>> queue = null;
-
         /// <summary>
         /// Configuration Items selected
         /// </summary>
@@ -34,22 +27,14 @@ namespace LaptopOrchestra.Kinect
         /// <param name="e">event arguments</param>
         void App_Startup(object sender, StartupEventArgs e)
         {
-			// Initialize logger
-			log4net.Config.XmlConfigurator.Configure();
-			Logger.Debug("App Startup");
+            ShutdownMode = ShutdownMode.OnLastWindowClose;
 
-			// Initialize our queue to pass data from Kinect Thread to Communications Thread
-			queue = new Queue<IDictionary<JointType, Joint>>();
+            // Initialize logger
+            log4net.Config.XmlConfigurator.Configure();
+			Logger.Debug("App Startup");
 
             ConfigurationFlags = new Dictionary<JointType, bool>();
 
-            // Initialize main GUI
-            var configurationTool = new ConfigurationTool(this.queue, ConfigurationFlags)
-            {
-                Top = 200,
-                Left = 500
-            };
-            configurationTool.Show();
 
             // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
             /*KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
@@ -57,10 +42,19 @@ namespace LaptopOrchestra.Kinect
             kinectSimulator.Left = 600;
             kinectSimulator.Show();*/
 
-            var dataConsumer = new DataConsumer(this.queue, ConfigurationFlags);
-            var consumer = new Thread(dataConsumer.Consume);
+            KinectProcessor kinectProcessor = new KinectProcessor();
 
-            consumer.Start();
+            new DataSubscriber(ConfigurationFlags, kinectProcessor);
+
+
+            // Initialize main GUI
+            var configurationTool = new ConfigurationTool(ConfigurationFlags, kinectProcessor)
+            {
+                Top = 200,
+                Left = 500
+            };
+            configurationTool.Show();
+
         }
     }
 }

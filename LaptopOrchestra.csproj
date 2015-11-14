@@ -101,7 +101,8 @@
     <Compile Include="ConfigurationTool.xaml.cs">
       <DependentUpon>ConfigurationTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataConsumer.cs" />
+    <Compile Include="DataSubscriber.cs" />
+    <Compile Include="KinectProcessor.cs" />
     <Compile Include="KinectSimulatorData.cs" />
     <Compile Include="KinectSimulator.xaml.cs">
       <DependentUpon>KinectSimulator.xaml</DependentUpon>
