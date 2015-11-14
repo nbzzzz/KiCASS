@@ -1,9 +1,5 @@
 ﻿using Microsoft.Kinect;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -130,12 +126,7 @@ namespace LaptopOrchestra.Kinect
                 return (float)maxPixel;
             }
 
-            if (value < 0)
-            {
-                return 0;
-            }
-
-            return value;
+            return value < 0 ? 0 : value;
         }
 
         #endregion
@@ -171,18 +162,12 @@ namespace LaptopOrchestra.Kinect
             canvas.DrawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
             canvas.DrawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
 
-            var JointSendList = configurationFlags.Where(x => x.Value == true).Select(cf => cf.Key);
-
-            foreach (Joint joint in body.Joints.Values)
+            foreach (var configurationFlag in configurationFlags)
             {
-                if (JointSendList.Any(x => x == joint.JointType))
-                {
-                    canvas.DrawPoint(joint, Colors.ForestGreen);
-                }
-                else
-                {
-                    canvas.DrawPoint(joint, Colors.LightSalmon);
-                }
+                var joint = body.Joints[configurationFlag.Key];
+                var ifSend = configurationFlag.Value;
+
+                canvas.DrawPoint(joint, ifSend ? Colors.ForestGreen : Colors.LightSalmon);
             }
         }
 

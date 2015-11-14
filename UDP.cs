@@ -1,38 +1,52 @@
 ﻿using System;
 using System.Net;
+using LaptopOrchestra.Kinect;
 using Rug.Osc;
 
 public static class UDP
 {
-	private static int _connectPort;
-	private static IPAddress _userIP;
-	private static OscSender _sender;
+    /// <summary>
+    ///     Port data will be streamed to
+    /// </summary>
+    private static int _connectPort;
 
-	public static void StartDataOut()
-	{
-		try
-		{
-			_sender = new OscSender(_userIP, _connectPort);
-			_sender.Connect();
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine(e.ToString());
-		}
-	}
+    /// <summary>
+    ///     IP Address data will be streamed to
+    /// </summary>
+    private static IPAddress _userIP;
 
-	public static void StopDataOut()
-	{
-		_sender.Close();
-	}
+    /// <summary>
+    ///     Object that will send OSC Packets through UDP
+    /// </summary>
+    private static OscSender _sender;
 
-	public static void ConfigureIpAndPort(string ip, int port)
-	{
-		if(_sender != null)
-		{
-			StopDataOut();
-		}
-        try {
+    public static void StartDataOut()
+    {
+        try
+        {
+            _sender = new OscSender(_userIP, _connectPort);
+            _sender.Connect();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            Logger.Debug(e.Message);
+        }
+    }
+
+    public static void StopDataOut()
+    {
+        _sender.Close();
+    }
+
+    public static void ConfigureIpAndPort(string ip, int port)
+    {
+        if (_sender != null)
+        {
+            StopDataOut();
+        }
+        try
+        {
             _userIP = IPAddress.Parse(ip);
             _connectPort = port;
         }
@@ -41,11 +55,11 @@ public static class UDP
             Console.WriteLine("INVALID IP or PORT");
         }
 
-		StartDataOut();
-	}
+        StartDataOut();
+    }
 
-	public static void SendMessage(OscMessage message)
-	{
-		_sender.Send(message);
-	}
+    public static void SendMessage(OscMessage message)
+    {
+        _sender.Send(message);
+    }
 }

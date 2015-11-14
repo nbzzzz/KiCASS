@@ -1,44 +1,43 @@
 ﻿<Window x:Class="LaptopOrchestra.Kinect.ConfigurationTool"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:LaptopOrchestra.Kinect"
-    Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="720" Width="1112">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="720" Width="1112">
     <Window.Resources>
 
     </Window.Resources>
     <Grid ShowGridLines="False" Height="1000" Margin="2,0,-2, 0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="150" />
 
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="50" />
 
-            <ColumnDefinition Width="712"/>
+            <ColumnDefinition Width="712" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="620"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="620" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="50,20,0,0">
-            <ListView Name="lvJoints" FontSize="14" MinHeight="600" MaxWidth="250" SelectionMode="multiple" SelectionChanged="lvJoints_SelectionChanged"/>
+            <ListView Name="lvJoints" FontSize="14" MinHeight="600" MaxWidth="250" SelectionMode="multiple"
+                      SelectionChanged="lvJoints_SelectionChanged" />
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" Margin="50,20,0,0">
-            <Button x:Name="btnSelectAll" Content="Select All" Click="btnSelectAll_Click"/>
+            <Button x:Name="btnSelectAll" Content="Select All" Click="btnSelectAll_Click" />
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1" Margin="50,20,0,0">
-            <Button x:Name="btnClearAll" Content="Clear All" Click="btnClearAll_Click"/>
+            <Button x:Name="btnClearAll" Content="Clear All" Click="btnClearAll_Click" />
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="6" Grid.RowSpan="6">
-            <Image x:Name="camera" Height="530"/>
+            <Image x:Name="camera" Height="530" />
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="6" Grid.RowSpan="6">
-            <Canvas x:Name="canvas" Height="546"/>
-            <Label HorizontalAlignment="Left" FontSize="22" Content="1) Select the joints that will be sent"/>
-            <Label HorizontalAlignment="Left" FontSize="22" Content="2) Configure IP and Port and Click Start"/>
-            <TextBox x:Name="IP" Height="23" TextWrapping="Wrap" Text="IP Address" Margin="50,0,450,10"/>
-            <TextBox x:Name="Port" Height="23" TextWrapping="Wrap" Text="Port" Margin="300,-32,200,50"/>
-            <Button x:Name="Start" Content="Start" Click="Start_Click" Margin="550,-72,50,50"/>
+            <Canvas x:Name="canvas" Height="546" />
+            <Label HorizontalAlignment="Left" FontSize="22" Content="1) Select the joints that will be sent" />
+            <Label HorizontalAlignment="Left" FontSize="22" Content="2) Configure IP and Port and Click Start" />
+            <TextBox x:Name="IP" Height="23" TextWrapping="Wrap" Text="IP Address" Margin="50,0,450,10" />
+            <TextBox x:Name="Port" Height="23" TextWrapping="Wrap" Text="Port" Margin="300,-32,200,50" />
+            <Button x:Name="Start" Content="Start" Click="Start_Click" Margin="550,-72,50,50" />
         </StackPanel>
     </Grid>
 </Window>

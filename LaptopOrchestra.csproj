@@ -97,15 +97,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BitmapHelper.cs" />
-    <Compile Include="ConfigurationFlags.cs" />
     <Compile Include="ConfigurationTool.xaml.cs">
       <DependentUpon>ConfigurationTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataConsumer.cs" />
-    <Compile Include="KinectSimulatorData.cs" />
-    <Compile Include="KinectSimulator.xaml.cs">
-      <DependentUpon>KinectSimulator.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="DataSubscriber.cs" />
+    <Compile Include="KinectProcessor.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="OscBuilder.cs" />
     <Compile Include="UDP.cs" />
@@ -117,10 +113,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="KinectSimulator.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -146,9 +138,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="SimulatorData\shoot.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
