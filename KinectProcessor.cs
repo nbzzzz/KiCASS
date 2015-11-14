@@ -1,27 +1,9 @@
 ﻿using Microsoft.Kinect;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace LaptopOrchestra.Kinect
 {
-
     public class KinectProcessor
     {
-        #region Members
-
-        /// <summary>
-        /// Reader that will interprate data comming from Kinect
-        /// </summary>
-        public MultiSourceFrameReader Reader;
-
-        /// <summary>
-        /// Microsoft Kinect 2.0 sensor 
-        /// </summary>
-        private KinectSensor _sensor;
-
-        #endregion
-
         #region Constructor
 
         public KinectProcessor()
@@ -31,18 +13,31 @@ namespace LaptopOrchestra.Kinect
 
         #endregion
 
+        #region Members
+
+        /// <summary>
+        ///     Reader that will interprate data comming from Kinect
+        /// </summary>
+        public MultiSourceFrameReader Reader;
+
+        /// <summary>
+        ///     Microsoft Kinect 2.0 sensor
+        /// </summary>
+        private KinectSensor _sensor;
+
+        #endregion
+
         #region Event handlers
 
         private void StartKinect()
         {
             _sensor = KinectSensor.GetDefault();
 
-            if (_sensor != null)
-            {
-                _sensor.Open();
+            if (_sensor == null) return;
 
-                Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-            }
+            _sensor.Open();
+
+            Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
         }
 
         private void StopKinect()
@@ -54,5 +49,4 @@ namespace LaptopOrchestra.Kinect
 
         #endregion
     }
-
 }

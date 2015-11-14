@@ -1,25 +1,22 @@
-using System.Windows;
-using System.Windows.Input;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Kinect;
 
 namespace LaptopOrchestra.Kinect
 {
-
     public partial class ConfigurationTool : Window
     {
         /// <summary>
-        /// List of bodies
-        /// </summary>
-        private IList<Body> _bodies;
-
-        /// <summary>
-        /// Configuration Items selected
+        ///     Configuration Items selected
         /// </summary>
         private readonly Dictionary<JointType, bool> _configurationFlags;
+
+        /// <summary>
+        ///     List of bodies
+        /// </summary>
+        private IList<Body> _bodies;
 
         public ConfigurationTool(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor)
         {
@@ -27,68 +24,15 @@ namespace LaptopOrchestra.Kinect
 
             _configurationFlags = configurationFlags;
 
-            var jointTypes = Enum.GetValues(typeof(JointType));
-            foreach (JointType jt in jointTypes) {
+            var jointTypes = Enum.GetValues(typeof (JointType));
+            foreach (JointType jt in jointTypes)
+            {
                 lvJoints.Items.Add(jt);
                 configurationFlags[jt] = false;
-           }
+            }
 
             kinectProcessor.Reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
-
         }
-
-        #region UI Event Listeners
-
-        private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof(JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = false;
-            }
-
-            foreach ( var item in lvJoints.SelectedItems)
-            {
-                JointType jt = (JointType)Enum.Parse(typeof(JointType), item.ToString(), true);
-                _configurationFlags[jt] = true;
-            }
-
-        }
-
-        private void btnSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof(JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = true;
-            }
-            lvJoints.SelectAll();
-        }
-
-        private void btnClearAll_Click(object sender, RoutedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof(JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = false;
-            }
-            lvJoints.UnselectAll();
-        }
-
-        private void Start_Click(object sender, RoutedEventArgs e)
-        {
-            var ip = IP.Text;
-            try {
-                var port = int.Parse(Port.Text);
-                UDP.ConfigureIpAndPort(ip, port);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        #endregion
 
         private void Window_Closed(object sender, EventArgs e)
         {
@@ -137,5 +81,58 @@ namespace LaptopOrchestra.Kinect
                 }
             }
         }
+
+        #region UI Event Listeners
+
+        private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof (JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                _configurationFlags[jt] = false;
+            }
+
+            foreach (var item in lvJoints.SelectedItems)
+            {
+                var jt = (JointType) Enum.Parse(typeof (JointType), item.ToString(), true);
+                _configurationFlags[jt] = true;
+            }
+        }
+
+        private void btnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof (JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                _configurationFlags[jt] = true;
+            }
+            lvJoints.SelectAll();
+        }
+
+        private void btnClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            var jointTypes = Enum.GetValues(typeof (JointType));
+            foreach (JointType jt in jointTypes)
+            {
+                _configurationFlags[jt] = false;
+            }
+            lvJoints.UnselectAll();
+        }
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
+            var ip = IP.Text;
+            try
+            {
+                var port = int.Parse(Port.Text);
+                UDP.ConfigureIpAndPort(ip, port);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        #endregion
     }
 }

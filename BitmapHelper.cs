@@ -126,12 +126,7 @@ namespace LaptopOrchestra.Kinect
                 return (float)maxPixel;
             }
 
-            if (value < 0)
-            {
-                return 0;
-            }
-
-            return value;
+            return value < 0 ? 0 : value;
         }
 
         #endregion

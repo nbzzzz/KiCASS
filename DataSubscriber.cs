@@ -1,24 +1,22 @@
-using System;
-using Microsoft.Kinect;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Kinect;
 
 namespace LaptopOrchestra.Kinect
 {
     public class DataSubscriber
     {
         /// <summary>
-        /// Configuration Flags Object
+        ///     Configuration Flags Object
         /// </summary>
         private readonly Dictionary<JointType, bool> _configurationFlags;
 
         /// <summary>
-        /// OSC message builder
+        ///     OSC message builder
         /// </summary>
         private readonly OscBuilder _oscBuilder;
 
         /// <summary>
-        /// Bodies that will containt the data from the Kinect
+        ///     Bodies that will containt the data from the Kinect
         /// </summary>
         private Body[] _bodies;
 
@@ -62,5 +60,4 @@ namespace LaptopOrchestra.Kinect
             }
         }
     }
-
 }
