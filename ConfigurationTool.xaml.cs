@@ -125,7 +125,8 @@ namespace LaptopOrchestra.Kinect
             try
             {
                 var port = int.Parse(Port.Text);
-                UDP.ConfigureIpAndPort(ip, port);
+                //TODO: Sender is not static anymore
+				//UDPSender.ConfigureIpAndPort(ip, port);
             }
             catch
             {
