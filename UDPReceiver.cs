@@ -43,12 +43,16 @@ namespace LaptopOrchestra.Kinect
 						// parse the message
 						string[] msg = packet.ToString().Split(new string[] { ", " }, StringSplitOptions.None);
 						string[] msgAddress = msg[0].Split(new char[] { '/' });
-
+						
+						var ip = msg[1].Replace("\"", "");
+						var port = int.Parse(msg[2]);
+						
 						// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
-						SessionWorker session = _sessionManager.OpenConnections.First(x => x.Ip == msg[1] && x.SendPort == Int32.Parse(msg[2]));
+						SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.SendPort == port);
+
 						if (session == null)
 						{
-							session = new SessionWorker(msg[1], Int32.Parse(msg[2]), _dataPub);
+							session = new SessionWorker(ip, port, _dataPub);
 							_sessionManager.AddConnection(session);
 						}
 						session.SetConfigFlags(msgAddress);
