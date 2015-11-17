@@ -48,7 +48,7 @@ namespace LaptopOrchestra.Kinect
 			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _configFlags)
 			{
 				_configFlags[pair.Key] = false;
-				if (address.FirstOrDefault(x => x == pair.Key.ToString()) != "")
+				if (address.Any(x => x == pair.Key.ToString()))
 				{
 					_configFlags[pair.Key] = true;
 				}
