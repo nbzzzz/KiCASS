@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -15,6 +15,8 @@ namespace LaptopOrchestra.Kinect
 		private int _sendPort;
 		private string _ip;
 		private Dictionary<Microsoft.Kinect.JointType, bool> _configFlags;
+		private Dictionary<Microsoft.Kinect.JointType, bool> _lookupFlags;
+		private System.Timers.Timer _configTimer;
 
 		public int SendPort
 		{
@@ -32,6 +34,12 @@ namespace LaptopOrchestra.Kinect
 			set { _configFlags = value; }
 		}
 
+		public Dictionary<Microsoft.Kinect.JointType, bool> LookupFlags
+		{
+			get { return _lookupFlags; }
+			set { _lookupFlags = value; }
+		}
+
 		public SessionWorker(string ip, int sendPort, KinectProcessor dataPub)
 		{
 			_ip = ip;
@@ -41,17 +49,39 @@ namespace LaptopOrchestra.Kinect
 			_dataPub = dataPub;
 			_configFlags = new Dictionary<Microsoft.Kinect.JointType, bool>();
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
+
+			SetConfigTimer();
 		}
 
-		public void SetConfigFlags(string[] address)
+		private void SetConfigTimer()
 		{
-			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _configFlags)
+			Thread.Sleep(500);
+			_configTimer = new System.Timers.Timer(5000);
+			_configTimer.Elapsed += _configTimer_Elapsed;
+			_configTimer.Enabled = true;
+		}
+
+		private void _configTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			ApplyLookupFlags();
+        }
+
+		public void SetLookupFlags(string[] address)
+		{
+			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _lookupFlags)
 			{
-				_configFlags[pair.Key] = false;
 				if (address.Any(x => x == pair.Key.ToString()))
 				{
 					_configFlags[pair.Key] = true;
 				}
+			}
+		}
+
+		private void ApplyLookupFlags()
+		{
+			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _lookupFlags)
+			{
+				_configFlags[pair.Key] = pair.Value;
 			}
 		}
 

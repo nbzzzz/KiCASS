@@ -55,7 +55,7 @@ namespace LaptopOrchestra.Kinect
 							session = new SessionWorker(ip, port, _dataPub);
 							_sessionManager.AddConnection(session);
 						}
-						session.SetConfigFlags(msgAddress);
+						session.SetLookupFlags(msgAddress);
 					}
 				}
 			}
