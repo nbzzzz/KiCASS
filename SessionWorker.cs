@@ -17,6 +17,8 @@ namespace LaptopOrchestra.Kinect
 		private Dictionary<Microsoft.Kinect.JointType, bool> _configFlags;
 		private Dictionary<Microsoft.Kinect.JointType, bool> _lookupFlags;
 		private System.Timers.Timer _configTimer;
+		private int waitLookupTime = 500;
+		private int totalConfigInterval = 5000;
 
 		public int SendPort
 		{
@@ -55,14 +57,18 @@ namespace LaptopOrchestra.Kinect
 
 		private void SetConfigTimer()
 		{
-			Thread.Sleep(500);
-			_configTimer = new System.Timers.Timer(5000);
+			Thread.Sleep(waitLookupTime);
+			ClearLookupFlags();
+			ApplyLookupFlags();
+			_configTimer = new System.Timers.Timer(totalConfigInterval - waitLookupTime);
 			_configTimer.Elapsed += _configTimer_Elapsed;
 			_configTimer.Enabled = true;
 		}
 
 		private void _configTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
+			ClearLookupFlags();
+			Thread.Sleep(waitLookupTime);
 			ApplyLookupFlags();
         }
 
@@ -74,6 +80,14 @@ namespace LaptopOrchestra.Kinect
 				{
 					_configFlags[pair.Key] = true;
 				}
+			}
+		}
+
+		private void ClearLookupFlags()
+		{
+			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _lookupFlags)
+			{
+				_configFlags[pair.Key] = false;
 			}
 		}
 
