@@ -18,11 +18,17 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         private IList<Body> _bodies;
 
+        /// <summary>
+        ///     Used to fixed alignment issue between skeleton positional data and color image
+        /// </summary>
+        private CoordinateMapper _coordinateMapper;
+
         public ConfigurationTool(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor)
         {
             InitializeComponent();
 
             _configurationFlags = configurationFlags;
+            _coordinateMapper = kinectProcessor.CoordinateMapper;
 
             var jointTypes = Enum.GetValues(typeof (JointType));
             foreach (JointType jt in jointTypes)
@@ -43,12 +49,12 @@ namespace LaptopOrchestra.Kinect
         {
             var reference = e.FrameReference.AcquireFrame();
 
-            // Draw the Image from the camera
+            // Draw the Image from the Camera
             using (var frame = reference.ColorFrameReference.AcquireFrame())
             {
                 if (frame != null)
                 {
-                    camera.Source = frame.ToBitmap();
+                    Camera.Source = frame.ToBitmap();
                 }
             }
 
@@ -57,7 +63,7 @@ namespace LaptopOrchestra.Kinect
             {
                 if (frame == null) return;
 
-                canvas.Children.Clear();
+                Canvas.Children.Clear();
 
                 _bodies = new Body[frame.BodyFrameSource.BodyCount];
 
@@ -67,72 +73,44 @@ namespace LaptopOrchestra.Kinect
                 {
                     if (body == null || !body.IsTracked) continue;
 
-                    IDictionary<JointType, Joint> newJoint = new Dictionary<JointType, Joint>();
 
-                    foreach (var joint in body.Joints)
+                    IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
+
+                    // convert the joint points to depth (display) space
+                    Dictionary<JointType, Point> alignedJointPoints = new Dictionary<JointType, Point>();
+
+                    foreach (JointType jointType in joints.Keys)
                     {
-                        newJoint.Add(joint.Value.JointType, joint.Value);
+                        // sometimes the depth(Z) of an inferred joint may show as negative
+                        // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
+                        CameraSpacePoint position = joints[jointType].Position;
+                        if (position.Z < 0)
+                        {
+                            position.Z = 0.01f;
+                        }
+
+                        ColorSpacePoint colorPoint = _coordinateMapper.MapCameraPointToColorSpace(position);
+
+                        if (jointType == JointType.AnkleRight || jointType == JointType.FootRight)
+                        {
+                            Console.WriteLine(jointType);
+                            Console.WriteLine(joints[jointType].TrackingState);
+                            Console.WriteLine(position.X + " " + colorPoint.X);
+                            Console.WriteLine(position.Y + " " + colorPoint.Y);
+                 
+                            Console.WriteLine("-------");
+                        }
+                        var x = colorPoint.X;
+                        var y = colorPoint.Y;
+
+                        alignedJointPoints[jointType] = new Point(x, y);
                     }
 
-                    if (!body.IsTracked) continue;
 
                     // Draw skeleton.
-                    canvas.DrawSkeleton(body, _configurationFlags);
+                    Canvas.DrawSkeleton(body, alignedJointPoints, _configurationFlags);
                 }
             }
         }
-
-        #region UI Event Listeners
-
-        private void lvJoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof (JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = false;
-            }
-
-            foreach (var item in lvJoints.SelectedItems)
-            {
-                var jt = (JointType) Enum.Parse(typeof (JointType), item.ToString(), true);
-                _configurationFlags[jt] = true;
-            }
-        }
-
-        private void btnSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof (JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = true;
-            }
-            lvJoints.SelectAll();
-        }
-
-        private void btnClearAll_Click(object sender, RoutedEventArgs e)
-        {
-            var jointTypes = Enum.GetValues(typeof (JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                _configurationFlags[jt] = false;
-            }
-            lvJoints.UnselectAll();
-        }
-
-        private void Start_Click(object sender, RoutedEventArgs e)
-        {
-            var ip = IP.Text;
-            try
-            {
-                var port = int.Parse(Port.Text);
-                UDP.ConfigureIpAndPort(ip, port);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        #endregion
     }
 }
