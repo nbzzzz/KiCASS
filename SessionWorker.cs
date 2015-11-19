@@ -57,8 +57,8 @@ namespace LaptopOrchestra.Kinect
 
 		private void SetConfigTimer()
 		{
-			Thread.Sleep(waitLookupTime);
 			ClearLookupFlags();
+			Thread.Sleep(waitLookupTime);
 			ApplyLookupFlags();
 			_configTimer = new System.Timers.Timer(totalConfigInterval - waitLookupTime);
 			_configTimer.Elapsed += _configTimer_Elapsed;
@@ -67,10 +67,9 @@ namespace LaptopOrchestra.Kinect
 
 		private void _configTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
-			ClearLookupFlags();
-			Thread.Sleep(waitLookupTime);
 			ApplyLookupFlags();
-        }
+			ClearLookupFlags();
+		}
 
 		public void SetLookupFlags(string[] address)
 		{
@@ -87,7 +86,7 @@ namespace LaptopOrchestra.Kinect
 		{
 			foreach (KeyValuePair<Microsoft.Kinect.JointType, bool> pair in _lookupFlags)
 			{
-				_configFlags[pair.Key] = false;
+				_lookupFlags[pair.Key] = false;
 			}
 		}
 
