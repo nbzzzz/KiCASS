@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Kinect;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -31,6 +32,12 @@ namespace LaptopOrchestra.Kinect
 			{
 				session.CloseSession();
 			}
+			_openConnections.Clear();
+		}
+
+		public void RemoveConnection(SessionWorker session)
+		{
+			_openConnections.Remove(session);
 		}
 	}
 }
