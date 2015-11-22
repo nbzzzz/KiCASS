@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using Microsoft.Kinect;
 
 namespace LaptopOrchestra.Kinect
@@ -20,8 +17,7 @@ namespace LaptopOrchestra.Kinect
 		private Dictionary<JointType, bool> _lookupFlags;
 		private Dictionary<JointType, bool> _flagIterator;
 		private System.Timers.Timer _configTimer;
-		private int waitLookupTime = 500;
-		private int totalConfigInterval = 5000;
+		private int _configInterval = 5000;
 
 		public int Port
 		{
@@ -57,13 +53,9 @@ namespace LaptopOrchestra.Kinect
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
 		}
 
-		public void SetConfigTimer(string[] address)
+		public void SetTimers(string[] address)
 		{
-			SetLookupFlags(address);
-			Thread.Sleep(waitLookupTime);
-			ApplyLookupFlags();
-			ClearLookupFlags();
-			_configTimer = new System.Timers.Timer(totalConfigInterval);
+			_configTimer = new System.Timers.Timer(_configInterval);
 			_configTimer.Elapsed += _configTimer_Elapsed;
 			_configTimer.Enabled = true;
 		}
@@ -73,8 +65,8 @@ namespace LaptopOrchestra.Kinect
 			if (CheckLookupFlags())
 			{
 				ApplyLookupFlags();
-				ClearLookupFlags();
 			}
+			ClearLookupFlags();
 		}
 
 		private bool CheckLookupFlags()
@@ -96,6 +88,7 @@ namespace LaptopOrchestra.Kinect
 					_lookupFlags[key] = true;
 				}
 			}
+			ApplyLookupFlags();
 		}
 
 		private void ClearLookupFlags()
@@ -134,6 +127,7 @@ namespace LaptopOrchestra.Kinect
 			_configTimer.Close();
 			_udpSender.StopDataOut();
 			_sessionManager.RemoveConnection(this);
+			GC.Collect();
 		}
 	}
 }

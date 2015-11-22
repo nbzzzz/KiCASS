@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Rug.Osc;
 
 namespace LaptopOrchestra.Kinect
@@ -53,12 +50,9 @@ namespace LaptopOrchestra.Kinect
 					{
 						session = new SessionWorker(ip, port, _dataPub, _sessionManager);
 						_sessionManager.AddConnection(session);
-						session.SetConfigTimer(msgAddress);
+						session.SetTimers(msgAddress);
 					}
-					else
-					{
-						session.SetLookupFlags(msgAddress);
-					}
+					session.SetLookupFlags(msgAddress);
 				}
 			}
 		}
