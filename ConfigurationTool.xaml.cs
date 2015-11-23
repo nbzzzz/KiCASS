@@ -91,19 +91,7 @@ namespace LaptopOrchestra.Kinect
 
                         ColorSpacePoint colorPoint = _coordinateMapper.MapCameraPointToColorSpace(position);
 
-                        if (jointType == JointType.AnkleRight || jointType == JointType.FootRight)
-                        {
-                            Console.WriteLine(jointType);
-                            Console.WriteLine(joints[jointType].TrackingState);
-                            Console.WriteLine(position.X + " " + colorPoint.X);
-                            Console.WriteLine(position.Y + " " + colorPoint.Y);
-                 
-                            Console.WriteLine("-------");
-                        }
-                        var x = colorPoint.X;
-                        var y = colorPoint.Y;
-
-                        alignedJointPoints[jointType] = new Point(x, y);
+                        alignedJointPoints[jointType] = new Point(colorPoint.X, colorPoint.Y);
                     }
 
 

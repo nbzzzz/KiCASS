@@ -47,8 +47,9 @@ namespace LaptopOrchestra.Kinect
 
             var kinectProcessor = new KinectProcessor();
 
-            new DataSubscriber(ConfigurationFlags, kinectProcessor);
+			var sessionManager = new SessionManager();
 
+			var udpReceiver = new UDPReceiver(8080, sessionManager, kinectProcessor);
 
             // Initialize main GUI
             var configurationTool = new ConfigurationTool(ConfigurationFlags, kinectProcessor)
