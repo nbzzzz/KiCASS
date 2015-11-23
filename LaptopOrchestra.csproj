@@ -103,8 +103,11 @@
     <Compile Include="DataSubscriber.cs" />
     <Compile Include="KinectProcessor.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="SessionWorker.cs" />
     <Compile Include="OscBuilder.cs" />
-    <Compile Include="UDP.cs" />
+    <Compile Include="SessionManager.cs" />
+    <Compile Include="UDPReceiver.cs" />
+    <Compile Include="UDPSender.cs" />
     <Page Include="ConfigurationTool.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

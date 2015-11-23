@@ -3,24 +3,30 @@ using System.Net;
 using LaptopOrchestra.Kinect;
 using Rug.Osc;
 
-public static class UDP
+public class UDPSender
 {
     /// <summary>
     ///     Port data will be streamed to
     /// </summary>
-    private static int _connectPort;
+    private int _connectPort;
 
     /// <summary>
     ///     IP Address data will be streamed to
     /// </summary>
-    private static IPAddress _userIP;
+    private IPAddress _userIP;
 
     /// <summary>
     ///     Object that will send OSC Packets through UDP
     /// </summary>
-    private static OscSender _sender;
+    private OscSender _sender;
 
-    public static void StartDataOut()
+	public UDPSender(string ip, int port)
+	{
+		_userIP = IPAddress.Parse(ip);
+		_connectPort = port;
+	}
+
+    public void StartDataOut()
     {
         try
         {
@@ -34,31 +40,12 @@ public static class UDP
         }
     }
 
-    public static void StopDataOut()
+    public void StopDataOut()
     {
         _sender.Close();
     }
 
-    public static void ConfigureIpAndPort(string ip, int port)
-    {
-        if (_sender != null)
-        {
-            StopDataOut();
-        }
-        try
-        {
-            _userIP = IPAddress.Parse(ip);
-            _connectPort = port;
-        }
-        catch
-        {
-            Console.WriteLine("INVALID IP or PORT");
-        }
-
-        StartDataOut();
-    }
-
-    public static void SendMessage(OscMessage message)
+    public void SendMessage(OscMessage message)
     {
         _sender.Send(message);
     }

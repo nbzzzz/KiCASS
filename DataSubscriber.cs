@@ -20,14 +20,17 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         private Body[] _bodies;
 
+		private UDPSender _dataSender;
 
-        public DataSubscriber(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor)
+
+        public DataSubscriber(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor, UDPSender dataSender)
         {
             _oscBuilder = new OscBuilder();
 
             _configurationFlags = configurationFlags;
 
-            UDP.ConfigureIpAndPort("127.0.0.1", 8000);
+			_dataSender = dataSender;
+			_dataSender.StartDataOut();
 
             kinectProcessor.Reader.MultiSourceFrameArrived += MultiSourceFrameHandler;
         }
@@ -54,7 +57,7 @@ namespace LaptopOrchestra.Kinect
                         if (!_configurationFlags[joint.Key]) continue;
 
                         var jointMessage = _oscBuilder.BuildJointMessage(joint.Value);
-                        UDP.SendMessage(jointMessage);
+                        _dataSender.SendMessage(jointMessage);
                     }
                 }
             }
