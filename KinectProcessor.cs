@@ -21,6 +21,11 @@ namespace LaptopOrchestra.Kinect
         public MultiSourceFrameReader Reader;
 
         /// <summary>
+        ///      Used to fixed alignment issue between skeleton positional data and color image
+        /// </summary>
+        public CoordinateMapper CoordinateMapper;
+
+        /// <summary>
         ///     Microsoft Kinect 2.0 sensor
         /// </summary>
         private KinectSensor _sensor;
@@ -38,6 +43,7 @@ namespace LaptopOrchestra.Kinect
             _sensor.Open();
 
             Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+            CoordinateMapper = _sensor.CoordinateMapper;
         }
 
         private void StopKinect()

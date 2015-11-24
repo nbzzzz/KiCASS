@@ -1,5 +1,7 @@
-﻿using Microsoft.Kinect;
+﻿using System;
+using Microsoft.Kinect;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -9,12 +11,43 @@ namespace LaptopOrchestra.Kinect
 {
     public static class BitmapHelper
     {
+        /// <summary>
+        /// Color used for drawing hands that are currently tracked as closed
+        /// </summary>
+        private static readonly Color HandClosedBrush = Color.FromArgb(128, 255, 0, 0);
+
+        /// <summary>
+        /// Color used for drawing hands that are currently tracked as opened
+        /// </summary>
+        private static readonly Color HandOpenBrush = Color.FromArgb(128, 0, 255, 0);
+
+        /// <summary>
+        /// Color used for drawing hands that are currently tracked as in lasso (pointer) position
+        /// </summary>
+        private static readonly Color HandLassoBrush = Color.FromArgb(128, 0, 0, 255);
+
+        /// <summary>
+        /// Color used for drawing joints that are currently tracked
+        /// </summary>
+        private static readonly Color TrackedJointColor = Color.FromArgb(255, 68, 192, 68);
+
+        /// <summary>
+        /// Color used for drawing joints that are currently inferred
+        /// </summary>        
+        private static readonly Color InferredJointColor = Color.FromArgb(255, 255, 255, 0);
+
+        /// <summary>
+        /// Color used for drawing bones that are currently inferred
+        /// </summary>        
+        private static readonly Color InferredBoneColor = Color.FromArgb(255, 60, 60, 60);
+
         #region Camera
 
         public static ImageSource ToBitmap(this ColorFrame frame)
         {
             int width = frame.FrameDescription.Width;
             int height = frame.FrameDescription.Height;
+
             PixelFormat format = PixelFormats.Bgr32;
 
             byte[] pixels = new byte[width * height * ((format.BitsPerPixel + 7) / 8)];
@@ -33,180 +66,170 @@ namespace LaptopOrchestra.Kinect
             return BitmapSource.Create(width, height, 96, 96, format, null, pixels, stride);
         }
 
-        public static ImageSource ToBitmap(this DepthFrame frame)
-        {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            PixelFormat format = PixelFormats.Bgr32;
-
-            ushort minDepth = frame.DepthMinReliableDistance;
-            ushort maxDepth = frame.DepthMaxReliableDistance;
-
-            ushort[] pixelData = new ushort[width * height];
-            byte[] pixels = new byte[width * height * (format.BitsPerPixel + 7) / 8];
-
-            frame.CopyFrameDataToArray(pixelData);
-
-            int colorIndex = 0;
-            for (int depthIndex = 0; depthIndex < pixelData.Length; ++depthIndex)
-            {
-                ushort depth = pixelData[depthIndex];
-
-                byte intensity = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);
-
-                pixels[colorIndex++] = intensity; // Blue
-                pixels[colorIndex++] = intensity; // Green
-                pixels[colorIndex++] = intensity; // Red
-
-                ++colorIndex;
-            }
-
-            int stride = width * format.BitsPerPixel / 8;
-
-            return BitmapSource.Create(width, height, 96, 96, format, null, pixels, stride);
-        }
-
-        public static ImageSource ToBitmap(this InfraredFrame frame)
-        {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            PixelFormat format = PixelFormats.Bgr32;
-
-            ushort[] frameData = new ushort[width * height];
-            byte[] pixels = new byte[width * height * (format.BitsPerPixel + 7) / 8];
-
-            frame.CopyFrameDataToArray(frameData);
-
-            int colorIndex = 0;
-            for (int infraredIndex = 0; infraredIndex < frameData.Length; infraredIndex++)
-            {
-                ushort ir = frameData[infraredIndex];
-
-                byte intensity = (byte)(ir >> 7);
-
-                pixels[colorIndex++] = (byte)(intensity / 1); // Blue
-                pixels[colorIndex++] = (byte)(intensity / 1); // Green   
-                pixels[colorIndex++] = (byte)(intensity / 0.4); // Red
-
-                colorIndex++;
-            }
-
-            int stride = width * format.BitsPerPixel / 8;
-
-            return BitmapSource.Create(width, height, 96, 96, format, null, pixels, stride);
-        }
-
-        #endregion
-
-        #region Body
-
-        public static Joint ScaleTo(this Joint joint, double width, double height, float skeletonMaxX, float skeletonMaxY)
-        {
-            joint.Position = new CameraSpacePoint
-            {
-                X = Scale(width, skeletonMaxX, joint.Position.X),
-                Y = Scale(height, skeletonMaxY, -joint.Position.Y),
-                Z = joint.Position.Z
-            };
-
-            return joint;
-        }
-
-        public static Joint ScaleTo(this Joint joint, double width, double height)
-        {
-            return ScaleTo(joint, width, height, 1.0f, 1.0f);
-        }
-
-        private static float Scale(double maxPixel, double maxSkeleton, float position)
-        {
-            float value = (float)((((maxPixel / maxSkeleton) / 2) * position) + (maxPixel / 2));
-
-            if (value > maxPixel)
-            {
-                return (float)maxPixel;
-            }
-
-            return value < 0 ? 0 : value;
-        }
-
         #endregion
 
         #region Drawing
 
-        public static void DrawSkeleton(this Canvas canvas, Body body, Dictionary<JointType, bool> configurationFlags)
+        public static void DrawSkeleton(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints,
+            Dictionary<JointType, bool> configurationFlags)
         {
             if (body == null) return;
 
-            canvas.DrawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
-            canvas.DrawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
-            canvas.DrawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderLeft]);
-            canvas.DrawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderRight]);
-            canvas.DrawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.SpineMid]);
-            canvas.DrawLine(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ElbowLeft]);
-            canvas.DrawLine(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ElbowRight]);
-            canvas.DrawLine(body.Joints[JointType.ElbowLeft], body.Joints[JointType.WristLeft]);
-            canvas.DrawLine(body.Joints[JointType.ElbowRight], body.Joints[JointType.WristRight]);
-            canvas.DrawLine(body.Joints[JointType.WristLeft], body.Joints[JointType.HandLeft]);
-            canvas.DrawLine(body.Joints[JointType.WristRight], body.Joints[JointType.HandRight]);
-            canvas.DrawLine(body.Joints[JointType.HandLeft], body.Joints[JointType.HandTipLeft]);
-            canvas.DrawLine(body.Joints[JointType.HandRight], body.Joints[JointType.HandTipRight]);
-            canvas.DrawLine(body.Joints[JointType.HandTipLeft], body.Joints[JointType.ThumbLeft]);
-            canvas.DrawLine(body.Joints[JointType.HandTipRight], body.Joints[JointType.ThumbRight]);
-            canvas.DrawLine(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase]);
-            canvas.DrawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipLeft]);
-            canvas.DrawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipRight]);
-            canvas.DrawLine(body.Joints[JointType.HipLeft], body.Joints[JointType.KneeLeft]);
-            canvas.DrawLine(body.Joints[JointType.HipRight], body.Joints[JointType.KneeRight]);
-            canvas.DrawLine(body.Joints[JointType.KneeLeft], body.Joints[JointType.AnkleLeft]);
-            canvas.DrawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
-            canvas.DrawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
-            canvas.DrawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
+            // a bone defined as a line between two joints
+            var bones = new List<Tuple<JointType, JointType>>();
 
-            foreach (var configurationFlag in configurationFlags)
+            // Torso
+            bones.Add(new Tuple<JointType, JointType>(JointType.Head, JointType.Neck));
+            bones.Add(new Tuple<JointType, JointType>(JointType.Neck, JointType.SpineShoulder));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.SpineMid));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineMid, JointType.SpineBase));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineShoulder, JointType.ShoulderLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.SpineBase, JointType.HipLeft));
+
+            // Right Arm
+            bones.Add(new Tuple<JointType, JointType>(JointType.ShoulderRight, JointType.ElbowRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.ElbowRight, JointType.WristRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.WristRight, JointType.HandRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.HandRight, JointType.HandTipRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.WristRight, JointType.ThumbRight));
+
+            // Left Arm
+            bones.Add(new Tuple<JointType, JointType>(JointType.ShoulderLeft, JointType.ElbowLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.ElbowLeft, JointType.WristLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.HandLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.HandLeft, JointType.HandTipLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.WristLeft, JointType.ThumbLeft));
+
+            // Right Leg
+            bones.Add(new Tuple<JointType, JointType>(JointType.HipRight, JointType.KneeRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.KneeRight, JointType.AnkleRight));
+            bones.Add(new Tuple<JointType, JointType>(JointType.AnkleRight, JointType.FootRight));
+
+            // Left Leg
+            bones.Add(new Tuple<JointType, JointType>(JointType.HipLeft, JointType.KneeLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
+            bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
+                
+            canvas.DrawBones(body, jointPoints, bones);
+            canvas.DrawJoints(body, jointPoints);
+            canvas.DrawHand(jointPoints[JointType.HandLeft], body.HandLeftState);
+            canvas.DrawHand(jointPoints[JointType.HandRight], body.HandRightState);
+        }
+
+        private static void DrawBones(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints, List<Tuple<JointType, JointType>> bones)
+        {
+            foreach (var bone in bones)
             {
-                var joint = body.Joints[configurationFlag.Key];
-                var ifSend = configurationFlag.Value;
+                var jointType0 = bone.Item1;
+                var jointType1 = bone.Item2;
+                Joint joint0 = body.Joints[jointType0];
+                Joint joint1 = body.Joints[jointType1];
+                Point point0 = jointPoints[jointType0];
+                Point point1 = jointPoints[jointType1];
 
-                canvas.DrawPoint(joint, ifSend ? Colors.ForestGreen : Colors.LightSalmon);
+                // If we can't find either of these joints, exit
+                if (joint0.TrackingState == TrackingState.NotTracked ||
+                    joint1.TrackingState == TrackingState.NotTracked)
+                {
+                    return;
+                }
+
+                // If mapped points are not valid then do not draw
+                if (point0.X.Equals(double.NegativeInfinity) || point0.Y.Equals(double.NegativeInfinity) ||
+                    point1.X.Equals(double.NegativeInfinity) || point1.Y.Equals(double.NegativeInfinity) )
+                {
+                    return;
+                }
+
+                // We assume all drawn bones are inferred unless BOTH joints are tracked
+                Color drawColor = InferredBoneColor;
+
+                if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
+                {
+                    //TODO change this depending on body number; pass in the pen
+                    drawColor = Color.FromArgb(255, 255, 0, 0);
+                }
+
+                // Draw a line to represent the bones
+
+                canvas.DrawLine(jointPoints[jointType0], jointPoints[jointType1], drawColor);
             }
         }
 
-        public static void DrawPoint(this Canvas canvas, Joint joint, Color color)
+        private static void DrawJoints(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints) {
+
+            foreach (var joint in jointPoints.Keys)
+            {
+                if (jointPoints[joint].X.Equals(double.NegativeInfinity) ||
+                    jointPoints[joint].Y.Equals(double.NegativeInfinity)) return;
+
+                var isTracked = body.Joints[joint].TrackingState != TrackingState.Tracked;
+                var point = jointPoints[joint];
+
+                canvas.DrawPoint(point , isTracked ? Colors.ForestGreen : Colors.LightSalmon);
+            }
+
+        }
+
+        private static void DrawHand(this Canvas canvas, Point handPosition, HandState handState)
         {
-            if (joint.TrackingState == TrackingState.NotTracked) return;
+            double handSize = 90;
 
-            joint = joint.ScaleTo(canvas.ActualWidth, canvas.ActualHeight);
+            switch (handState)
+            {
+                case HandState.Closed:
+                    canvas.DrawPoint(handPosition, HandClosedBrush, handSize);
+                    break;
 
+                case HandState.Open:
+                    canvas.DrawPoint(handPosition, HandOpenBrush, handSize);
+                    break;
+
+                case HandState.Lasso:
+                    canvas.DrawPoint(handPosition, HandLassoBrush, handSize);
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Geometry Drawing
+
+        public static void DrawPoint(this Canvas canvas, Point point, Color color, double radius)
+        {
             Ellipse ellipse = new Ellipse
             {
-                Width = 20,
-                Height = 20,
+                Width = 2*radius,
+                Height = 2*radius,
                 Fill = new SolidColorBrush(color),
                 Stroke = new SolidColorBrush(Colors.LightBlue),
                 StrokeThickness = 3
             };
 
-            Canvas.SetLeft(ellipse, joint.Position.X - ellipse.Width / 2);
-            Canvas.SetTop(ellipse, joint.Position.Y - ellipse.Height / 2);
+            Canvas.SetLeft(ellipse, point.X - ellipse.Width / 2);
+            Canvas.SetTop(ellipse, point.Y - ellipse.Height / 2);
 
             canvas.Children.Add(ellipse);
         }
 
-        public static void DrawLine(this Canvas canvas, Joint first, Joint second)
+        public static void DrawPoint(this Canvas canvas, Point point, Color color)
         {
-            if (first.TrackingState == TrackingState.NotTracked || second.TrackingState == TrackingState.NotTracked) return;
+            canvas.DrawPoint(point, color, 10);
+        }
 
-            first = first.ScaleTo(canvas.ActualWidth, canvas.ActualHeight);
-            second = second.ScaleTo(canvas.ActualWidth, canvas.ActualHeight);
 
+        public static void DrawLine(this Canvas canvas, Point firstPoint, Point secondPoint, Color color)
+        {
             Line line = new Line
             {
-                X1 = first.Position.X,
-                Y1 = first.Position.Y,
-                X2 = second.Position.X,
-                Y2 = second.Position.Y,
+                X1 = firstPoint.X,
+                Y1 = firstPoint.Y,
+                X2 = secondPoint.X,
+                Y2 = secondPoint.Y,
                 StrokeThickness = 8,
-                Stroke = new SolidColorBrush(Colors.LightBlue)
+                Stroke = new SolidColorBrush(color)
             };
 
             canvas.Children.Add(line);
