@@ -11,50 +11,74 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         ///     Configuration Items selected
         /// </summary>
-        private readonly Dictionary<JointType, bool> _configurationFlags;
+        private readonly List<Dictionary<JointType, bool>> _configurationFlags;
 
         /// <summary>
         ///     List of bodies
         /// </summary>
-        private IList<Body> _bodies;
-
+        private IList<Body>        _bodies;
+        private List<ItemsControl> _items;
+        private List<Image>        _images;
+        private List<Canvas>       _canvases;
+        private TabList _tabList;
         /// <summary>
         ///     Used to fixed alignment issue between skeleton positional data and color image
         /// </summary>
         private CoordinateMapper _coordinateMapper;
+        private SessionManager _sessionManager;
 
-        public ConfigurationTool(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor)
+        public ConfigurationTool(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
             InitializeComponent();
+            _configurationFlags = new List<Dictionary<JointType, bool>>();
 
-            _configurationFlags = configurationFlags;
+            _tabList = new TabList();
+            _items = new List<ItemsControl>();
+            _canvases = new List<Canvas>();
+            _images = new List<Image>();
+            _items.Add(new ItemsControl());
+            _images.Add(new Image());
+            _canvases.Add(new Canvas());
+
+
+            TabData tabData = new TabData("Tab 1",_items[0],_images[0],_canvases[0]);
+
+            _sessionManager = sessionManager;
+            foreach(SessionWorker sw in _sessionManager.OpenConnections )
+            {
+                _configurationFlags.Add(sw.ConfigFlags);
+            }
+            
             _coordinateMapper = kinectProcessor.CoordinateMapper;
 
             var jointTypes = Enum.GetValues(typeof (JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                lvJoints.Items.Add(jt);
-                configurationFlags[jt] = false;
-            }
 
+            
+
+            
             kinectProcessor.Reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
         }
+
 
         private void Window_Closed(object sender, EventArgs e)
         {
             //TODO subscribe KinectProcess.Stop() and UDP.stop() to this event; maybe this can go inside App.xaml.cs instead
         }
+        
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             var reference = e.FrameReference.AcquireFrame();
+
+            
+            
 
             // Draw the Image from the Camera
             using (var frame = reference.ColorFrameReference.AcquireFrame())
             {
                 if (frame != null)
                 {
-                    Camera.Source = frame.ToBitmap();
+                    _.Source = frame.ToBitmap();
                 }
             }
 
@@ -96,7 +120,7 @@ namespace LaptopOrchestra.Kinect
 
 
                     // Draw skeleton.
-                    Canvas.DrawSkeleton(body, alignedJointPoints, _configurationFlags);
+                    Canvas.DrawSkeleton(body, alignedJointPoints, _configurationFlags[0]);
                 }
             }
         }
