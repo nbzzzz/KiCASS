@@ -54,8 +54,8 @@ namespace LaptopOrchestra.Kinect
             // Initialize main GUI
             var configurationTool = new ConfigurationTool(ConfigurationFlags, kinectProcessor)
             {
-                Top = 200,
-                Left = 500
+                Top = 0,
+                Left = 0
             };
             configurationTool.Show();
         }
