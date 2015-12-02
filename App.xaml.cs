@@ -4,57 +4,60 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Windows;
+using log4net.Config;
+using Microsoft.Kinect;
+
+[assembly: XmlConfigurator(Watch = true)]
+
 namespace LaptopOrchestra.Kinect
 {
-    using Microsoft.Kinect;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Threading;
-    using System.Windows;
-
     /// <summary>
-    /// Interaction logic for App
+    ///     Interaction logic for App
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        ///     Configuration Items selected
+        /// </summary>
+        public Dictionary<JointType, bool> ConfigurationFlags;
 
         /// <summary>
-        /// Queue to communicate between Kinect Data Producer and Data Comsumer
-        /// </summary>
-        private Queue<IReadOnlyDictionary<JointType,Joint>> queue = null;
-        
-        /// <summary>
-        /// Execute start up tasks
+        ///     Execute start up tasks
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
-        void App_Startup(object sender, StartupEventArgs e)
+        private void App_Startup(object sender, StartupEventArgs e)
         {
-            // Initialize our queue to pass data from Kinect Thread to Communications Thread
-            this.queue = new Queue<IReadOnlyDictionary<JointType, Joint>>();
+            ShutdownMode = ShutdownMode.OnLastWindowClose;
 
-//            MainWindow mainWindow = new MainWindow(this.queue);
-//            mainWindow.Top = 200;
-//            mainWindow.Left = 500;
-//            mainWindow.Show();
+            // Initialize logger
+            XmlConfigurator.Configure();
+            Logger.Debug("App Startup");
 
-            ConfigurationTool configurationTool = new ConfigurationTool();
-            configurationTool.Top = 200;
-            configurationTool.Left = 500;
-            configurationTool.Show();
-            
+            ConfigurationFlags = new Dictionary<JointType, bool>();
 
-            KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
+
+            // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
+            /*KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
             kinectSimulator.Top = 200;
             kinectSimulator.Left = 600;
-            kinectSimulator.Show();
+            kinectSimulator.Show();*/
 
-            DataConsumer dataConsumer = new DataConsumer(this.queue, configurationTool);
+            var kinectProcessor = new KinectProcessor();
 
-            Thread consumer = new Thread(dataConsumer.consume);
+			var sessionManager = new SessionManager();
 
-            consumer.Start();
+			var udpReceiver = new UDPReceiver(8080, sessionManager, kinectProcessor);
+
+            // Initialize main GUI
+            var configurationTool = new ConfigurationTool(ConfigurationFlags, kinectProcessor)
+            {
+                Top = 0,
+                Left = 0
+            };
+            configurationTool.Show();
         }
     }
 }

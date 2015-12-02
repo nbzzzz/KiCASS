@@ -65,6 +65,9 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>dll\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>dll\Microsoft.Kinect.dll</HintPath>
@@ -93,17 +96,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConfigurationFlags.cs" />
+    <Compile Include="BitmapHelper.cs" />
     <Compile Include="ConfigurationTool.xaml.cs">
       <DependentUpon>ConfigurationTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataConsumer.cs" />
+    <Compile Include="DataSubscriber.cs" />
     <Compile Include="KinectProcessor.cs" />
-    <Compile Include="KinectSimulatorData.cs" />
-    <Compile Include="KinectSimulator.xaml.cs">
-      <DependentUpon>KinectSimulator.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UDP.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="SessionWorker.cs" />
+    <Compile Include="OscBuilder.cs" />
+    <Compile Include="SessionManager.cs" />
+    <Compile Include="UDPReceiver.cs" />
+    <Compile Include="UDPSender.cs" />
     <Page Include="ConfigurationTool.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,10 +116,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="KinectSimulator.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -141,9 +141,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="SimulatorData\shoot.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
