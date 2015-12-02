@@ -69,8 +69,6 @@ namespace LaptopOrchestra.Kinect
             var jointTypes = Enum.GetValues(typeof(JointType));
             lock(_sessionManager)
             {
-
-
                 foreach (SessionWorker sw in _sessionManager.OpenConnections)
                 {
                     string id = sw.Ip + ":" + sw.Port.ToString();
