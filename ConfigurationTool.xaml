@@ -12,31 +12,28 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ContentTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=itemListWidth}"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <ItemsControl Name="{Binding Path=items}" FontSize="14" Grid.Column="0"/>
-
-                <Image Name="{Binding Path=image}" 
-								 Grid.Column="1" 
-								 Height="{Binding Path=height}" 
-								 Width="{Binding Path=width}"/>
-
-                <Canvas Name="{Binding Path=canvas}" 
-									Grid.Column="1" 
-									Height="{Binding Path=height}" 
-								  Width="{Binding Path=width}"/>
-            </Grid>
+            <ItemsControl ItemsSource="{Binding Path=Items}" FontSize="14" Grid.Column="0"/>            
         </DataTemplate>
     </Window.Resources>
     <DockPanel>
-        <TabControl ItemsSource="{Binding Source={StaticResource TabListResource}}"
-                  ItemTemplate="{StaticResource HeaderTemplate}"
-                  ContentTemplate="{StaticResource ContentTemplate}"
-									TabStripPlacement="Top" 
-									Margin="0, 0, 0, 10"
-                  />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+            <TabControl x:Name="tabControl"
+                        ItemsSource="{Binding Source={StaticResource TabListResource}}"
+                        Grid.Column="0" 
+                        ItemTemplate="{StaticResource HeaderTemplate}"
+                        ContentTemplate="{StaticResource ContentTemplate}"
+					    TabStripPlacement="Top" 
+					    Margin="0,0,0,9.667" Width="169" />
+
+        
+
+            <Image Name="XAMLImage" Grid.Column="1" Height="1080" Width="1920"/>
+            <Canvas Name="XAMLCanvas" Grid.Column="1" Height="1080" Width="1920"/>
+        </Grid>
     </DockPanel>
+
 </Window>
