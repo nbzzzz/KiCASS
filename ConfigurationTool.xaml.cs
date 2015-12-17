@@ -23,9 +23,9 @@ namespace LaptopOrchestra.Kinect
         private TabList _tabList;
 
         /// <summary>
-        ///     Index of tabs using ip and port as key
+        ///     Local list of tabs
         /// </summary>
-        private Dictionary<String, int> _tabIndex;
+        List<TabData> _localSessions;
         /// <summary>
         ///     Used to fixed alignment issue between skeleton positional data and color image
         /// </summary>
@@ -46,77 +46,89 @@ namespace LaptopOrchestra.Kinect
 
             _coordinateMapper = kinectProcessor.CoordinateMapper;
             kinectProcessor.Reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
-            _tabIndex = new Dictionary<string, int>();
+            _localSessions = new List<TabData>();
             _tabList = new TabList();
+
             // Start timer for flag updating thread
-            _timer = new Timer(TimerTick,null, 0, 1000);
+            _timer = new Timer(TimerTick, null, 0, 1000);
             _thread = new Thread(updateFlags);
         }
 
         private void TimerTick(object state)
         {
-            if (!_thread.IsAlive)
-            {
+            // If flag updating thread is still running skip
+            if (!_thread.IsAlive)            {
                 _thread = new Thread(updateFlags);
                 _thread.Start();
-            }
-        
+            }        
         }
 
         private void updateFlags()
         {
-            List<String> jointList = new List<string>();
-            var jointTypes = Enum.GetValues(typeof(JointType));
-            int currentSelected = 0;
-            if (_tabIndex.Count > 0)
-            {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-
-                    currentSelected = tabControl.SelectedIndex;
-                }));
-            }
             
-           //lock(_sessionManager)
-           //{
-                foreach (SessionWorker sw in _sessionManager.OpenConnections)
+            var jointTypes = Enum.GetValues(typeof(JointType));
+
+            // Copy session workers so iteration doesnt break the collection
+            SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
+            _sessionManager.OpenConnections.CopyTo(workers);
+
+            foreach (SessionWorker sw in workers)
+            {
+                
+                // Get the port and IP of this session
+                string id = sw.Ip + ":" + sw.Port.ToString();
+
+                // Copy the flags
+                Dictionary<JointType, bool> flags;
+                flags = sw.ConfigFlags;
+
+                // Get the list of active joints
+                List<String> jointList = new List<string>();
+                foreach (JointType jt in jointTypes)
                 {
-                    string id = sw.Ip + ":" + sw.Port.ToString();
-                    Dictionary<JointType, bool> configurationFlags = sw.ConfigFlags;
-                    jointList.Clear();
-                    foreach (JointType jt in jointTypes)
+                    if (flags[jt])
                     {
-                        if (configurationFlags[jt])
-                        {
-                            jointList.Add(jt.ToString());
-                        }
-                    }
-
-                    TabData tabData = new TabData(id, jointList, sw.ConfigFlags);
-                    if (_tabIndex.ContainsKey(id))
-                    {
-                        this.Dispatcher.Invoke((Action)(() =>
-                        {
-                            _tabList.getTabs().RemoveAt(_tabIndex[id]);
-                            _tabList.getTabs().Insert(_tabIndex[id], tabData);
-                        }));
-                    }
-                    else
-                    {                        
-                        this.Dispatcher.Invoke((Action)(() =>
-                        {
-                            _tabList.getTabs().Add(tabData);
-                        }));
-
-                        _tabIndex.Add(id, _tabList.getIndex(tabData));
+                        jointList.Add(jt.ToString());
                     }
                 }
-                this.Dispatcher.Invoke((Action)(() =>
+                    
+                // If this session already exists update the flags
+                if (_localSessions.Exists(tab => tab.Header == id))
                 {
-                    tabControl.ItemsSource = _tabList;
-                    tabControl.SelectedIndex = currentSelected;                    
-                }));
-           //}      
+                    _localSessions.Find(tab => tab.Header.Equals(id)).displayFlags = flags;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Items = jointList;
+                } else
+                {
+                    TabData tabData = new TabData(id, jointList, flags);
+                    _localSessions.Add(tabData);
+                }                    
+            }
+            updateTabs();
+
+        }      
+
+        private void updateTabs()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                // Maintain the current tab selection
+                int currentSelected = 0;
+                if (_tabList.getTabs().Count > 1)
+                {
+                    currentSelected = tabControl.SelectedIndex;
+                }
+
+                // Update the list of tabs in the gui
+                _tabList.Clear();
+                foreach (TabData tab in _localSessions)
+                {
+                    _tabList.getTabs().Add(tab);
+                }
+                tabControl.ItemsSource = _tabList;
+
+                // Restore selection
+                tabControl.SelectedIndex = currentSelected;
+            }));
         }
 
         
@@ -181,7 +193,7 @@ namespace LaptopOrchestra.Kinect
                     if ( ti != null )
                     {                       
                         string id = ti.Header;
-                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, _tabList.getTabs()[_tabIndex[id]].displayFlags);
+                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, _localSessions[_localSessions.IndexOf(ti)].displayFlags);
                     } else                  
                     {
                         var jointTypes = Enum.GetValues(typeof(JointType));
