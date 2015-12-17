@@ -60,7 +60,8 @@ namespace LaptopOrchestra.Kinect
             if (!_thread.IsAlive)            {
                 _thread = new Thread(updateFlags);
                 _thread.Start();
-            }        
+            }
+        
         }
 
         private void updateFlags()
