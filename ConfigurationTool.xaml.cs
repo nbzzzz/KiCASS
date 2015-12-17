@@ -67,13 +67,23 @@ namespace LaptopOrchestra.Kinect
         {
             List<String> jointList = new List<string>();
             var jointTypes = Enum.GetValues(typeof(JointType));
-            lock(_sessionManager)
+            int currentSelected = 0;
+            if (_tabIndex.Count > 0)
             {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+
+                    currentSelected = tabControl.SelectedIndex;
+                }));
+            }
+            
+           //lock(_sessionManager)
+           //{
                 foreach (SessionWorker sw in _sessionManager.OpenConnections)
                 {
                     string id = sw.Ip + ":" + sw.Port.ToString();
                     Dictionary<JointType, bool> configurationFlags = sw.ConfigFlags;
-
+                    jointList.Clear();
                     foreach (JointType jt in jointTypes)
                     {
                         if (configurationFlags[jt])
@@ -82,19 +92,17 @@ namespace LaptopOrchestra.Kinect
                         }
                     }
 
-
+                    TabData tabData = new TabData(id, jointList, sw.ConfigFlags);
                     if (_tabIndex.ContainsKey(id))
                     {
                         this.Dispatcher.Invoke((Action)(() =>
                         {
-
-                            _tabList.getTabs()[_tabIndex[id]].Items = jointList;
-                            _tabList.getTabs()[_tabIndex[id]].displayFlags = sw.ConfigFlags;
+                            _tabList.getTabs().RemoveAt(_tabIndex[id]);
+                            _tabList.getTabs().Insert(_tabIndex[id], tabData);
                         }));
                     }
                     else
-                    {
-                        TabData tabData = new TabData(id, jointList, sw.ConfigFlags);
+                    {                        
                         this.Dispatcher.Invoke((Action)(() =>
                         {
                             _tabList.getTabs().Add(tabData);
@@ -106,12 +114,12 @@ namespace LaptopOrchestra.Kinect
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     tabControl.ItemsSource = _tabList;
+                    tabControl.SelectedIndex = currentSelected;                    
                 }));
-            }      
+           //}      
         }
 
-
-
+        
         private void Window_Closed(object sender, EventArgs e)
         {
             //TODO subscribe KinectProcess.Stop() and UDP.stop() to this event; maybe this can go inside App.xaml.cs instead
