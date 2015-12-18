@@ -50,7 +50,7 @@ namespace LaptopOrchestra.Kinect
             _tabList = new TabList();
 
             // Start timer for flag updating thread
-            _timer = new Timer(TimerTick, null, 0, 1000);
+            _timer = new Timer(TimerTick, null, 0, 100);
             _thread = new Thread(updateFlags);
         }
 
@@ -81,7 +81,7 @@ namespace LaptopOrchestra.Kinect
 
                 // Copy the flags
                 Dictionary<JointType, bool> flags;
-                flags = sw.ConfigFlags;
+                flags = sw.ConfigFlags;                
 
                 // Get the list of active joints
                 List<String> jointList = new List<string>();
@@ -98,9 +98,10 @@ namespace LaptopOrchestra.Kinect
                 {
                     _localSessions.Find(tab => tab.Header.Equals(id)).displayFlags = flags;
                     _localSessions.Find(tab => tab.Header.Equals(id)).Items = jointList;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Active = true;
                 } else
                 {
-                    TabData tabData = new TabData(id, jointList, flags);
+                    TabData tabData = new TabData(id, jointList, flags, true);
                     _localSessions.Add(tabData);
                 }                    
             }
@@ -123,7 +124,11 @@ namespace LaptopOrchestra.Kinect
                 _tabList.Clear();
                 foreach (TabData tab in _localSessions)
                 {
-                    _tabList.getTabs().Add(tab);
+                    if (tab.Active)
+                    {
+                        _tabList.getTabs().Add(tab);
+                    }
+                    tab.Active = false;
                 }
                 tabControl.ItemsSource = _tabList;
 
