@@ -3,47 +3,146 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Kinect;
+using System.ComponentModel;
+using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace LaptopOrchestra.Kinect
 {
     public partial class ConfigurationTool : Window
     {
-        /// <summary>
-        ///     Configuration Items selected
-        /// </summary>
-        private readonly Dictionary<JointType, bool> _configurationFlags;
-
+        
         /// <summary>
         ///     List of bodies
         /// </summary>
-        private IList<Body> _bodies;
+        private IList<Body>        _bodies;
 
+        /// <summary>
+        ///     List of tabs in gui
+        /// </summary>
+        private TabList _tabList;
+
+        /// <summary>
+        ///     Local list of tabs
+        /// </summary>
+        List<TabData> _localSessions;
         /// <summary>
         ///     Used to fixed alignment issue between skeleton positional data and color image
         /// </summary>
         private CoordinateMapper _coordinateMapper;
+        /// <summary>
+        ///     Copy of session manager to get open connections
+        /// </summary>
+        private SessionManager _sessionManager;
 
-        public ConfigurationTool(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor)
+        private Timer _timer;
+        private Thread _thread;
+
+        public ConfigurationTool(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
             InitializeComponent();
 
-            _configurationFlags = configurationFlags;
+            _sessionManager = sessionManager;
+
             _coordinateMapper = kinectProcessor.CoordinateMapper;
-
-            var jointTypes = Enum.GetValues(typeof (JointType));
-            foreach (JointType jt in jointTypes)
-            {
-                lvJoints.Items.Add(jt);
-                configurationFlags[jt] = false;
-            }
-
             kinectProcessor.Reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+            _localSessions = new List<TabData>();
+            _tabList = new TabList();
+
+            // Start timer for flag updating thread
+            _timer = new Timer(TimerTick, null, 0, 100);
+            _thread = new Thread(updateFlags);
         }
 
+        private void TimerTick(object state)
+        {
+            // If flag updating thread is still running skip
+            if (!_thread.IsAlive)            {
+                _thread = new Thread(updateFlags);
+                _thread.Start();
+            }
+        
+        }
+
+        private void updateFlags()
+        {
+            
+            var jointTypes = Enum.GetValues(typeof(JointType));
+
+            // Copy session workers so iteration doesnt break the collection
+            SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
+            _sessionManager.OpenConnections.CopyTo(workers);
+
+            foreach (SessionWorker sw in workers)
+            {
+                
+                // Get the port and IP of this session
+                string id = sw.Ip + ":" + sw.Port.ToString();
+
+                // Copy the flags
+                Dictionary<JointType, bool> flags;
+                flags = sw.ConfigFlags;                
+
+                // Get the list of active joints
+                List<String> jointList = new List<string>();
+                foreach (JointType jt in jointTypes)
+                {
+                    if (flags[jt])
+                    {
+                        jointList.Add(jt.ToString());
+                    }
+                }
+                    
+                // If this session already exists update the flags
+                if (_localSessions.Exists(tab => tab.Header == id))
+                {
+                    _localSessions.Find(tab => tab.Header.Equals(id)).displayFlags = flags;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Items = jointList;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Active = true;
+                } else
+                {
+                    TabData tabData = new TabData(id, jointList, flags, true);
+                    _localSessions.Add(tabData);
+                }                    
+            }
+            updateTabs();
+
+        }      
+
+        private void updateTabs()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                // Maintain the current tab selection
+                int currentSelected = 0;
+                if (_tabList.getTabs().Count > 1)
+                {
+                    currentSelected = tabControl.SelectedIndex;
+                }
+
+                // Update the list of tabs in the gui
+                _tabList.Clear();
+                foreach (TabData tab in _localSessions)
+                {
+                    if (tab.Active)
+                    {
+                        _tabList.getTabs().Add(tab);
+                    }
+                    tab.Active = false;
+                }
+                tabControl.ItemsSource = _tabList;
+
+                // Restore selection
+                tabControl.SelectedIndex = currentSelected;
+            }));
+        }
+
+        
         private void Window_Closed(object sender, EventArgs e)
         {
             //TODO subscribe KinectProcess.Stop() and UDP.stop() to this event; maybe this can go inside App.xaml.cs instead
         }
+        
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
@@ -54,7 +153,7 @@ namespace LaptopOrchestra.Kinect
             {
                 if (frame != null)
                 {
-                    Camera.Source = frame.ToBitmap();
+                    XAMLImage.Source = frame.ToBitmap();
                 }
             }
 
@@ -63,7 +162,7 @@ namespace LaptopOrchestra.Kinect
             {
                 if (frame == null) return;
 
-                Canvas.Children.Clear();
+                XAMLCanvas.Children.Clear();
 
                 _bodies = new Body[frame.BodyFrameSource.BodyCount];
 
@@ -95,10 +194,30 @@ namespace LaptopOrchestra.Kinect
                     }
 
 
-                    // Draw skeleton.
-                    Canvas.DrawSkeleton(body, alignedJointPoints, _configurationFlags);
+
+                    TabData ti = tabControl.SelectedItem as TabData;
+                    if ( ti != null )
+                    {                       
+                        string id = ti.Header;
+                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, _localSessions[_localSessions.IndexOf(ti)].displayFlags);
+                    } else                  
+                    {
+                        var jointTypes = Enum.GetValues(typeof(JointType));
+                        Dictionary<JointType, bool> displayFlags = new Dictionary<JointType, bool>();
+                        foreach (JointType jt in jointTypes)
+                        {                            
+                            displayFlags[jt] = true;
+                        }
+                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, displayFlags);
+                    }
+                   
+
                 }
             }
         }
+
+
+
     }
+    
 }
