@@ -52,7 +52,7 @@ namespace LaptopOrchestra.Kinect
 			var udpReceiver = new UDPReceiver(8080, sessionManager, kinectProcessor);
 
             // Initialize main GUI
-            var configurationTool = new ConfigurationTool(ConfigurationFlags, kinectProcessor)
+            var configurationTool = new ConfigurationTool(sessionManager, kinectProcessor)
             {
                 Top = 0,
                 Left = 0
