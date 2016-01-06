@@ -43,7 +43,7 @@ namespace LaptopOrchestra.Kinect
 
 					var ip = msg[1].Replace("\"", "");
 					var port = int.Parse(msg[2]);
-					var binSeq = msg[3].Replace("\"", "");
+					var binSeq = msg[3].Replace("\"", "").Reverse().ToString();
 						
 					// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
 					SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
