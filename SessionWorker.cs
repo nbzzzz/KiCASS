@@ -53,7 +53,7 @@ namespace LaptopOrchestra.Kinect
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
 		}
 
-		public void SetTimers(string[] address)
+		public void SetTimers()
 		{
 			_configTimer = new System.Timers.Timer(_configInterval);
 			_configTimer.Elapsed += _configTimer_Elapsed;
@@ -79,11 +79,11 @@ namespace LaptopOrchestra.Kinect
 			return true;
 		}
 
-		public void SetLookupFlags(string[] address)
+		public void SetLookupFlags(string address)
 		{
 			foreach (var key in _flagIterator.Keys)
 			{
-				if (address.Any(x => x == key.ToString()))
+				if (address[(int)key] == '1')
 				{
 					_lookupFlags[key] = true;
 				}
