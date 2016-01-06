@@ -17,6 +17,7 @@ namespace LaptopOrchestra.Kinect
         private int _itemListWidth;
         private List<String> _items;
         private Dictionary<JointType, bool> _displayFlags;
+        private bool _active;
 
 
         public TabData(string header, int height, int width, int itemListWidth, List<String> items, Dictionary<JointType, bool> displayFlags)
@@ -30,7 +31,7 @@ namespace LaptopOrchestra.Kinect
             _displayFlags = displayFlags;
 
         }
-        public TabData(string header, List<String> items, Dictionary<JointType, bool> displayFlags)
+        public TabData(string header, List<String> items, Dictionary<JointType, bool> displayFlags, bool active)
         {
             _header = header;
             _height = 1080;
@@ -38,6 +39,7 @@ namespace LaptopOrchestra.Kinect
             _itemListWidth = 200;
             _items = items;
             _displayFlags = displayFlags;
+            _active = active;
         }
 
         public string Header
@@ -81,6 +83,18 @@ namespace LaptopOrchestra.Kinect
             }
         }
 
+        public bool Active
+        {
+            get
+            {
+                return _active;
+            }
+
+            set
+            {
+                _active = value;
+            }
+        }
     }
 
     public class TabList : ObservableCollection<TabData>

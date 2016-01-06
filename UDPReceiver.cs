@@ -28,6 +28,7 @@ namespace LaptopOrchestra.Kinect
 		{
 			while (_receiver.State != OscSocketState.Closed)
 			{
+
 				// if we are in a state to recieve
 				if (_receiver.State == OscSocketState.Connected)
 				{
