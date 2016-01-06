@@ -81,10 +81,8 @@ namespace LaptopOrchestra.Kinect
 
 		public void SetLookupFlags(char[] address)
 		{
-		    Console.WriteLine(address);
 			foreach (var key in _flagIterator.Keys)
 			{
-			    Console.WriteLine((int)key);
 				if (address[(int)key] == '1')
 				{
 					_lookupFlags[key] = true;

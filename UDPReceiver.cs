@@ -45,7 +45,6 @@ namespace LaptopOrchestra.Kinect
 					var port = int.Parse(msg[2]);
 					var binSeq = msg[3].Replace("\"", "").ToCharArray();
 				    Array.Reverse(binSeq);
-						Console.WriteLine(binSeq);
 					// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
 					SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
 
