@@ -4,7 +4,7 @@ using Rug.Osc;
 
 namespace LaptopOrchestra.Kinect
 {
-    class OscBuilder
+    public class OscBuilder
     {
         public OscMessage BuildJointMessage(Joint joint)
         {	
