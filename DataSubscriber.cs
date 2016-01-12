@@ -52,6 +52,8 @@ namespace LaptopOrchestra.Kinect
                         var jointMessage = OscSerializer.BuildJointMessage(joint.Value);
                         _dataSender.SendMessage(jointMessage);
                     }
+
+					return;
                 }
             }
         }
