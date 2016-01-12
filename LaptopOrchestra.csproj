@@ -137,6 +137,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BitmapHelper.cs" />
+    <Compile Include="ConfigFlags.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="OscDeserializer.cs" />
     <Compile Include="TabData.cs" />
     <Compile Include="ConfigurationTool.xaml.cs">
       <DependentUpon>ConfigurationTool.xaml</DependentUpon>
@@ -145,7 +148,7 @@
     <Compile Include="KinectProcessor.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="SessionWorker.cs" />
-    <Compile Include="OscBuilder.cs" />
+    <Compile Include="OscSerializer.cs" />
     <Compile Include="SessionManager.cs" />
     <Compile Include="UDPReceiver.cs" />
     <Compile Include="UDPSender.cs" />
