@@ -6,6 +6,7 @@ using Microsoft.Kinect;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections.ObjectModel;
+using System.Windows.Interop;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -216,8 +217,35 @@ namespace LaptopOrchestra.Kinect
             }
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = HwndSource.FromVisual(this) as HwndSource;
+            if (source != null)
+            {
+                source.AddHook(new HwndSourceHook(WinProc));
+            }
+        }
+
+        public const Int32 WM_EXITSIZEMOVE = 0x0232;
+        private IntPtr WinProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, ref Boolean handled)
+        {
+            IntPtr result = IntPtr.Zero;
+            switch (msg)
+            {
+                case WM_EXITSIZEMOVE:
+                    {
+                        this.Height = this.Width * 0.5094;
+                        break;
+                    }
+            }
+
+            return result;
+        }
+
 
 
     }
+
     
 }

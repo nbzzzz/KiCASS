@@ -1,9 +1,9 @@
 ﻿<Window x:Class="LaptopOrchestra.Kinect.ConfigurationTool"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:src ="clr-namespace:LaptopOrchestra.Kinect"
-        
-        Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="1080" Width="2120" >
+        xmlns:src ="clr-namespace:LaptopOrchestra.Kinect" 
+        Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="1080" Width="2120" 
+        MinHeight="480" MinWidth="942">
 
     <Window.Resources>
         <ObjectDataProvider x:Key="TabListResource" ObjectType="{x:Type src:TabList}" />
@@ -16,7 +16,7 @@
         </DataTemplate>
     </Window.Resources>
     
-    <Viewbox>
+    <Viewbox Stretch="Uniform">
         <DockPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
