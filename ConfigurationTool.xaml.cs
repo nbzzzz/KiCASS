@@ -217,6 +217,9 @@ namespace LaptopOrchestra.Kinect
             }
         }
 
+        // This code came from the following url:        
+        // https://social.msdn.microsoft.com/Forums/vstudio/en-US/b0df3d1f-e211-4f54-a079-09af0096410e/keeping-a-windows-aspect-ratio-during-resize?forum=wpf
+        // Thanks to Marco Zhou
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -235,6 +238,7 @@ namespace LaptopOrchestra.Kinect
             {
                 case WM_EXITSIZEMOVE:
                     {
+                        // This ratio corresponds to 1080:2120
                         this.Height = this.Width * 0.5094;
                         break;
                     }
