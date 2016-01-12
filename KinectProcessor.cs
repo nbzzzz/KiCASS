@@ -8,8 +8,15 @@ namespace LaptopOrchestra.Kinect
 
         public KinectProcessor()
         {
-            StartKinect();
-        }
+			_sensor = KinectSensor.GetDefault();
+
+			if (_sensor == null) return;
+
+			_sensor.Open();
+
+			Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+			CoordinateMapper = _sensor.CoordinateMapper;
+		}
 
         #endregion
 
@@ -33,18 +40,6 @@ namespace LaptopOrchestra.Kinect
         #endregion
 
         #region Event handlers
-
-        private void StartKinect()
-        {
-            _sensor = KinectSensor.GetDefault();
-
-            if (_sensor == null) return;
-
-            _sensor.Open();
-
-            Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-            CoordinateMapper = _sensor.CoordinateMapper;
-        }
 
         private void StopKinect()
         {

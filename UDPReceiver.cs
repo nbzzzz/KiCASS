@@ -37,16 +37,14 @@ namespace LaptopOrchestra.Kinect
 					OscPacket packet = _receiver.Receive();
 
 					// parse the message
-					string[] msg = packet.ToString().Split(new string[] { ", " }, StringSplitOptions.None);
-					//skip the first index of the parsed address as it is an empty string (remove if refactored to not start osc message with leading /)
-					string[] msgAddress = msg[0].Split(new char[] { '/' }).Skip(1).ToArray();
+					string[] msg = OscDeserializer.ParseOscPacket(packet);
+					string[] msgAddress = OscDeserializer.GetMessageAddress(msg);
+					var ip = OscDeserializer.GetMessageIp(msg);
+					var port = OscDeserializer.GetMessagePort(msg);
+					var binSeq = OscDeserializer.GetMessageBinSeq(msg);
 
-					var ip = msg[1].Replace("\"", "");
-					var port = int.Parse(msg[2]);
-					var binSeq = msg[3].Replace("\"", "").ToCharArray();
-				    Array.Reverse(binSeq);
 					// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
-					SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
+					SessionWorker session = CheckSession(ip, port);
 
 					if (session == null)
 					{
@@ -57,6 +55,12 @@ namespace LaptopOrchestra.Kinect
 					session.SetLookupFlags(binSeq);
 				}
 			}
+		}
+
+		private SessionWorker CheckSession(string ip, int port)
+		{
+			SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
+			return session;
 		}
 
 		public void Close()

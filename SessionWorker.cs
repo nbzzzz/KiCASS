@@ -13,11 +13,11 @@ namespace LaptopOrchestra.Kinect
 		private UDPSender _udpSender;
 		private int _port;
 		private string _ip;
-		private Dictionary<JointType, bool> _configFlags;
-		private Dictionary<JointType, bool> _lookupFlags;
-		private Dictionary<JointType, bool> _flagIterator;
+		private ConfigFlags _configFlags;
+		private ConfigFlags _lookupFlags;
+		private ConfigFlags _flagIterator;
 		private System.Timers.Timer _configTimer;
-		private int _configInterval = 5000;
+		private bool _endSession;
 
 		public int Port
 		{
@@ -29,14 +29,31 @@ namespace LaptopOrchestra.Kinect
 			get { return _ip; }
 		}
 
-		public Dictionary<JointType, bool> ConfigFlags
+		public ConfigFlags ConfigFlags
 		{
 			get { return _configFlags; }
 		}
 
-		public Dictionary<JointType, bool> LookupFlags
+		public ConfigFlags LookupFlags
 		{
 			get { return _lookupFlags; }
+		}
+
+		public bool EndSession
+		{
+			get { return _endSession; }
+			set
+			{
+				if (value == true)
+				{
+					CloseSession();
+					_endSession = value;
+				}
+				else
+				{
+					_endSession = value;
+				}
+			}
 		}
 
 		public SessionWorker(string ip, int sendPort, KinectProcessor dataPub, SessionManager sessionManager)
@@ -44,18 +61,19 @@ namespace LaptopOrchestra.Kinect
 			_ip = ip;
 			_port = sendPort;
 			_udpSender = new UDPSender(_ip, _port);
+			_endSession = false;
 
 			_sessionManager = sessionManager;
 			_dataPub = dataPub;
-			_configFlags = InitFlags(_configFlags);
-			_lookupFlags = InitFlags(_lookupFlags);
-			_flagIterator = InitFlags(_flagIterator);
+			_configFlags = new ConfigFlags();
+			_lookupFlags = new ConfigFlags();
+			_flagIterator = new ConfigFlags();
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
 		}
 
 		public void SetTimers()
 		{
-			_configTimer = new System.Timers.Timer(_configInterval);
+			_configTimer = new System.Timers.Timer(Constants.SessionRecvConfigInterval);
 			_configTimer.Elapsed += _configTimer_Elapsed;
 			_configTimer.Enabled = true;
 		}
@@ -71,7 +89,7 @@ namespace LaptopOrchestra.Kinect
 
 		private bool CheckLookupFlags()
 		{
-			if (!_lookupFlags.Any(x => x.Value == true))
+			if (!_lookupFlags.JointFlags.Any(x => x.Value == true))
 			{
 				CloseSession();
 				return false;
@@ -81,11 +99,11 @@ namespace LaptopOrchestra.Kinect
 
 		public void SetLookupFlags(char[] address)
 		{
-			foreach (var key in _flagIterator.Keys)
+			foreach (var key in _flagIterator.JointFlags.Keys)
 			{
-				if (address[(int)key] == '1')
+				if (address[(int)key] == Constants.CharTrue)
 				{
-					_lookupFlags[key] = true;
+					_lookupFlags.JointFlags[key] = true;
 				}
 			}
 			ApplyLookupFlags();
@@ -93,9 +111,9 @@ namespace LaptopOrchestra.Kinect
 
 		private void ClearLookupFlags()
 		{
-			foreach (var key in _flagIterator.Keys)
+			foreach (var key in _flagIterator.JointFlags.Keys)
 			{
-				_lookupFlags[key] = false;
+				_lookupFlags.JointFlags[key] = false;
 			}
 		}
 
@@ -115,18 +133,17 @@ namespace LaptopOrchestra.Kinect
 
 		private void ApplyLookupFlags()
 		{
-			foreach (KeyValuePair<JointType, bool> pair in _lookupFlags)
+			foreach (KeyValuePair<JointType, bool> pair in _lookupFlags.JointFlags)
 			{
-				_configFlags[pair.Key] = pair.Value;
+				_configFlags.JointFlags[pair.Key] = pair.Value;
 			}
 		}
 
-		public void CloseSession()
+		private void CloseSession()
 		{
 			_configTimer.Stop();
 			_configTimer.Close();
 			_udpSender.StopDataOut();
-			_sessionManager.RemoveConnection(this);
 			GC.Collect();
 		}
 	}

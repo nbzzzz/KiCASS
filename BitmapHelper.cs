@@ -11,36 +11,6 @@ namespace LaptopOrchestra.Kinect
 {
     public static class BitmapHelper
     {
-        /// <summary>
-        /// Color used for drawing hands that are currently tracked as closed
-        /// </summary>
-        private static readonly Color HandClosedBrush = Color.FromArgb(128, 255, 0, 0);
-
-        /// <summary>
-        /// Color used for drawing hands that are currently tracked as opened
-        /// </summary>
-        private static readonly Color HandOpenBrush = Color.FromArgb(128, 0, 255, 0);
-
-        /// <summary>
-        /// Color used for drawing hands that are currently tracked as in lasso (pointer) position
-        /// </summary>
-        private static readonly Color HandLassoBrush = Color.FromArgb(128, 0, 0, 255);
-
-        /// <summary>
-        /// Color used for drawing joints that are currently tracked
-        /// </summary>
-        private static readonly Color TrackedJointColor = Color.FromArgb(255, 68, 192, 68);
-
-        /// <summary>
-        /// Color used for drawing joints that are currently inferred
-        /// </summary>        
-        private static readonly Color InferredJointColor = Color.FromArgb(255, 255, 255, 0);
-
-        /// <summary>
-        /// Color used for drawing bones that are currently inferred
-        /// </summary>        
-        private static readonly Color InferredBoneColor = Color.FromArgb(255, 60, 60, 60);
-
         #region Camera
 
         public static ImageSource ToBitmap(this ColorFrame frame)
@@ -144,7 +114,7 @@ namespace LaptopOrchestra.Kinect
                 }
 
                 // We assume all drawn bones are inferred unless BOTH joints are tracked
-                Color drawColor = InferredBoneColor;
+                Color drawColor = Constants.InferredBoneColor;
 
                 if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
                 {
@@ -180,15 +150,15 @@ namespace LaptopOrchestra.Kinect
             switch (handState)
             {
                 case HandState.Closed:
-                    canvas.DrawPoint(handPosition, HandClosedBrush, handSize);
+                    canvas.DrawPoint(handPosition, Constants.HandClosedBrush, handSize);
                     break;
 
                 case HandState.Open:
-                    canvas.DrawPoint(handPosition, HandOpenBrush, handSize);
+                    canvas.DrawPoint(handPosition, Constants.HandOpenBrush, handSize);
                     break;
 
                 case HandState.Lasso:
-                    canvas.DrawPoint(handPosition, HandLassoBrush, handSize);
+                    canvas.DrawPoint(handPosition, Constants.HandLassoBrush, handSize);
                     break;
             }
         }
