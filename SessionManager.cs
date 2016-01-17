@@ -37,11 +37,24 @@ namespace LaptopOrchestra.Kinect
 
 		private void CleanConnections()
 		{
+			var sessionTokens = new List<bool>();
 			foreach (var session in _openConnections)
 			{
 				if (session.EndSession)
 				{
-					_openConnections.Remove(session);
+					sessionTokens.Add(true);
+				}
+				else
+				{
+					sessionTokens.Add(false);
+				}
+			}
+
+			for (int i = 0; i < sessionTokens.Count; i++)
+			{
+				if (sessionTokens[i])
+				{
+					_openConnections.RemoveAt(i);
 				}
 			}
 		}

@@ -47,12 +47,8 @@ namespace LaptopOrchestra.Kinect
 				if (value == true)
 				{
 					CloseSession();
-					_endSession = value;
 				}
-				else
-				{
-					_endSession = value;
-				}
+				_endSession = value;
 			}
 		}
 
