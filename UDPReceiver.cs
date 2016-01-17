@@ -52,7 +52,7 @@ namespace LaptopOrchestra.Kinect
 						_sessionManager.AddConnection(session);
 						session.SetTimers();
 					}
-					session.SetLookupFlags(binSeq);
+					session.SetLookupJointFlags(binSeq);
 				}
 			}
 		}

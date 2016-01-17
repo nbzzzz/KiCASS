@@ -82,22 +82,22 @@ namespace LaptopOrchestra.Kinect
 		{
 			if (CheckLookupFlags())
 			{
-				ApplyLookupFlags();
+				ApplyLookupJointFlags();
 			}
-			ClearLookupFlags();
+			ClearLookupJointFlags();
 		}
 
 		private bool CheckLookupFlags()
 		{
-			if (!_lookupFlags.JointFlags.Any(x => x.Value == true))
+			if (!_lookupFlags.IfAnyConfig())
 			{
-				CloseSession();
+				EndSession = true;
 				return false;
 			}
 			return true;
 		}
 
-		public void SetLookupFlags(char[] address)
+		public void SetLookupJointFlags(char[] address)
 		{
 			foreach (var key in _flagIterator.JointFlags.Keys)
 			{
@@ -106,10 +106,10 @@ namespace LaptopOrchestra.Kinect
 					_lookupFlags.JointFlags[key] = true;
 				}
 			}
-			ApplyLookupFlags();
+			ApplyLookupJointFlags();
 		}
 
-		private void ClearLookupFlags()
+		private void ClearLookupJointFlags()
 		{
 			foreach (var key in _flagIterator.JointFlags.Keys)
 			{
@@ -131,7 +131,7 @@ namespace LaptopOrchestra.Kinect
 			return flags;
 		}
 
-		private void ApplyLookupFlags()
+		private void ApplyLookupJointFlags()
 		{
 			foreach (KeyValuePair<JointType, bool> pair in _lookupFlags.JointFlags)
 			{

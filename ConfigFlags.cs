@@ -12,6 +12,7 @@ namespace LaptopOrchestra.Kinect
 		private Dictionary<JointType, bool> _configFlags;
 		private List<Tuple<JointType, JointType>> _distanceFlags;
 		private List<Tuple<JointType, JointType>> _vectorFlags;
+		private Dictionary<string, bool> _handStateFlags;
 
 		public Dictionary<JointType, bool> JointFlags
 		{
@@ -31,14 +32,21 @@ namespace LaptopOrchestra.Kinect
 			set { _vectorFlags = value; }
 		}
 
+		public Dictionary<string, bool> HandStateFlags
+		{
+			get { return _handStateFlags; }
+			set { _handStateFlags = value; }
+		}
+
 		public ConfigFlags()
 		{
-			_configFlags = InitFlags(_configFlags);
+			_configFlags = InitJointFlags(_configFlags);
 			_distanceFlags = new List<Tuple<JointType, JointType>>();
 			_vectorFlags = new List<Tuple<JointType, JointType>>();
+			_handStateFlags = InitHandStates(_handStateFlags);
         }
 
-		private Dictionary<JointType, bool> InitFlags(Dictionary<JointType, bool> flags)
+		private Dictionary<JointType, bool> InitJointFlags(Dictionary<JointType, bool> flags)
 		{
 			var jointTypes = Enum.GetValues(typeof(JointType));
 
@@ -51,5 +59,19 @@ namespace LaptopOrchestra.Kinect
 
 			return flags;
 		}
+
+		private Dictionary<string, bool> InitHandStates(Dictionary<string, bool> flags)
+		{
+			flags = new Dictionary<string, bool>();
+			flags.Add("LeftHand", false);
+			flags.Add("RightHand", false);
+
+			return flags;
+		}
+
+		public bool IfAnyConfig()
+		{
+			return _configFlags.Any(x => x.Value == true) || _handStateFlags.Any(x => x.Value == true) || _distanceFlags.Any() || _vectorFlags.Any();
+        }
 	}
 }
