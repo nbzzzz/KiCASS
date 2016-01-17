@@ -50,7 +50,7 @@ namespace LaptopOrchestra.Kinect
 				}
 			}
 
-			for (int i = 0; i < sessionTokens.Count; i++)
+			for (int i = sessionTokens.Count; i > 0; i--)
 			{
 				if (sessionTokens[i])
 				{
