@@ -22,8 +22,7 @@ namespace LaptopOrchestra.Kinect
 		public static readonly Color HandOpenBrush = Color.FromArgb(128, 0, 255, 0);
 		public static readonly Color HandLassoBrush = Color.FromArgb(128, 0, 0, 255);
 		public static readonly Color TrackedColor = Colors.ForestGreen;
-        public static readonly Color InferredColor = Colors.Red;
+        public static readonly Color InferredColor = Color.FromArgb(255, 100, 100, 100);
 		public static readonly Color UntrackedBodyColor = Color.FromArgb(255, 50, 50, 50);
-		public static readonly Color PointBorderColor = Color.FromArgb(255, 100, 100, 100);
 	}
 }

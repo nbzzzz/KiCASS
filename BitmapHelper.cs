@@ -191,9 +191,7 @@ namespace LaptopOrchestra.Kinect
             {
                 Width = 2*radius,
                 Height = 2*radius,
-                Fill = new SolidColorBrush(color),
-                Stroke = new SolidColorBrush(Constants.PointBorderColor),
-                StrokeThickness = 3
+                Fill = new SolidColorBrush(color)
             };
 
             Canvas.SetLeft(ellipse, point.X - ellipse.Width / 2);
