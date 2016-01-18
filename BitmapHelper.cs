@@ -185,6 +185,8 @@ namespace LaptopOrchestra.Kinect
 
         public static void DrawPoint(this Canvas canvas, Point point, Color color, double radius)
         {
+            if (Double.IsInfinity(point.X) || Double.IsInfinity(point.Y)) return;
+
             Ellipse ellipse = new Ellipse
             {
                 Width = 2*radius,
