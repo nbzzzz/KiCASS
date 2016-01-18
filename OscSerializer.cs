@@ -34,10 +34,7 @@ namespace LaptopOrchestra.Kinect
 
 		public static OscMessage BuildHandStateMessage(HandState leftHand, HandState rightHand)
 		{
-			//// No idea if this works (TODO: Refactor?)
 			var address = Constants.OscHandStateAddr;
-			var leftState = leftHand;
-			var rightState = rightHand;
 
 			return new OscMessage(address, leftHand, rightHand);
 		}

@@ -17,6 +17,7 @@ namespace LaptopOrchestra.Kinect
 		public const string OscHandStateAddr = "/kinect/handstate";
 		public const char CharTrue = '1';
 		public const char CharFalse = '0';
+	    public static int MaxSessionRetries = 2;
 		public static readonly Color HandClosedBrush = Color.FromArgb(128, 255, 0, 0);
 		public static readonly Color HandOpenBrush = Color.FromArgb(128, 0, 255, 0);
 		public static readonly Color HandLassoBrush = Color.FromArgb(128, 0, 0, 255);

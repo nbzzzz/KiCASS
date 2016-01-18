@@ -18,6 +18,7 @@ namespace LaptopOrchestra.Kinect
 		private ConfigFlags _flagIterator;
 		private System.Timers.Timer _configTimer;
 		private bool _endSession;
+	    private int sessionRetries;
 
 		public int Port
 		{
@@ -34,11 +35,6 @@ namespace LaptopOrchestra.Kinect
 			get { return _configFlags; }
 		}
 
-		public ConfigFlags LookupFlags
-		{
-			get { return _lookupFlags; }
-		}
-
 		public bool EndSession
 		{
 			get { return _endSession; }
@@ -47,8 +43,12 @@ namespace LaptopOrchestra.Kinect
 				if (value == true)
 				{
 					CloseSession();
+					_endSession = value;
 				}
-				_endSession = value;
+				else
+				{
+					_endSession = value;
+				}
 			}
 		}
 
@@ -76,63 +76,28 @@ namespace LaptopOrchestra.Kinect
 
 		private void _configTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
-			if (CheckLookupFlags())
-			{
-				ApplyLookupJointFlags();
-			}
-			ClearLookupJointFlags();
+		    sessionRetries++;
+
+            if (sessionRetries > Constants.MaxSessionRetries)
+            {
+                EndSession = true;
+            }
 		}
 
-		private bool CheckLookupFlags()
-		{
-			if (!_lookupFlags.IfAnyConfig())
-			{
-				EndSession = true;
-				return false;
-			}
-			return true;
-		}
-
-		public void SetLookupJointFlags(char[] address)
+		public void SetJointFlags(char[] address)
 		{
 			foreach (var key in _flagIterator.JointFlags.Keys)
 			{
 				if (address[(int)key] == Constants.CharTrue)
 				{
-					_lookupFlags.JointFlags[key] = true;
+                    _configFlags.JointFlags[key] = true;
 				}
+				else
+				{
+                    _configFlags.JointFlags[key] = false;
+                }
 			}
-			ApplyLookupJointFlags();
-		}
-
-		private void ClearLookupJointFlags()
-		{
-			foreach (var key in _flagIterator.JointFlags.Keys)
-			{
-				_lookupFlags.JointFlags[key] = false;
-			}
-		}
-
-		private Dictionary<JointType, bool> InitFlags(Dictionary<JointType, bool> flags)
-		{
-			var jointTypes = Enum.GetValues(typeof(JointType));
-
-			flags = new Dictionary<JointType, bool>();
-
-			foreach (JointType jt in jointTypes)
-			{
-				flags[jt] = false;
-			}
-
-			return flags;
-		}
-
-		private void ApplyLookupJointFlags()
-		{
-			foreach (KeyValuePair<JointType, bool> pair in _lookupFlags.JointFlags)
-			{
-				_configFlags.JointFlags[pair.Key] = pair.Value;
-			}
+		    sessionRetries = 0;
 		}
 
 		private void CloseSession()

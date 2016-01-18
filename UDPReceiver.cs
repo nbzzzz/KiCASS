@@ -39,6 +39,7 @@ namespace LaptopOrchestra.Kinect
 					// parse the message
 					string[] msg = OscDeserializer.ParseOscPacket(packet);
 					string[] msgAddress = OscDeserializer.GetMessageAddress(msg);
+
 					var ip = OscDeserializer.GetMessageIp(msg);
 					var port = OscDeserializer.GetMessagePort(msg);
 					var binSeq = OscDeserializer.GetMessageBinSeq(msg);
@@ -52,7 +53,8 @@ namespace LaptopOrchestra.Kinect
 						_sessionManager.AddConnection(session);
 						session.SetTimers();
 					}
-					session.SetLookupJointFlags(binSeq);
+
+					session.SetJointFlags(binSeq);
 				}
 			}
 		}

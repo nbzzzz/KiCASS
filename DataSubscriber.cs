@@ -53,6 +53,12 @@ namespace LaptopOrchestra.Kinect
                         _dataSender.SendMessage(jointMessage);
                     }
 
+                    if (_configurationFlags.HandStateFlag)
+                    {
+                        var jointMessage = OscSerializer.BuildHandStateMessage(body.HandLeftState, body.HandRightState);
+                        _dataSender.SendMessage(jointMessage);
+                    }
+
 					return;
                 }
             }
