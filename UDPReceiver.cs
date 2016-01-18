@@ -36,7 +36,7 @@ namespace LaptopOrchestra.Kinect
 					// this will block until one arrives or the socket is closed
 					OscPacket packet = _receiver.Receive();
 
-				    Console.WriteLine(packet);
+				    if (!OscDeserializer.IsValid(packet)) continue;
 
 					// parse the message
 					string[] msg = OscDeserializer.ParseOscPacket(packet);
