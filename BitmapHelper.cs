@@ -120,7 +120,7 @@ namespace LaptopOrchestra.Kinect
                     //TODO change this depending on body number; pass in the pen
                     drawColor = Constants.TrackedBoneColor;
                 }
-				else
+				else if (!isFirst)
 				{
 					drawColor = Constants.UntrackedBodyColor;
 				}
@@ -144,7 +144,7 @@ namespace LaptopOrchestra.Kinect
 				{
 					canvas.DrawPoint(point, isTracked ? Constants.TrackedJointColor : Constants.UntrackedJointColor);
 				}
-                else
+                else if (!isFirst)
 				{
 					canvas.DrawPoint(point, Constants.UntrackedBodyColor);
 				}
@@ -173,7 +173,7 @@ namespace LaptopOrchestra.Kinect
 						break;
 				}
 			}
-			else
+			else if (!isFirst)
 			{
 				canvas.DrawPoint(handPosition, Constants.UntrackedBodyColor, handSize);
 			}
