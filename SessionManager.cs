@@ -37,7 +37,7 @@ namespace LaptopOrchestra.Kinect
 
 		private void CleanConnections()
 		{
-			for (int i = 0; i < _openConnections.Count; i++)
+			for (int i = _openConnections.Count-1; i >= 0; i--)
 			{
 				if (_openConnections[i].EndSession)
 				{
