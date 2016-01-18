@@ -142,7 +142,7 @@ namespace LaptopOrchestra.Kinect
 
 				if (isFirst)
 				{
-					canvas.DrawPoint(point, isTracked ? Constants.TrackedJointColor : Constants.UntrackedJointColor);
+					canvas.DrawPoint(point, isTracked ? Constants.TrackedJointColor : Constants.InferredJointColor);
 				}
                 else if (!isFirst)
 				{
@@ -190,7 +190,7 @@ namespace LaptopOrchestra.Kinect
                 Width = 2*radius,
                 Height = 2*radius,
                 Fill = new SolidColorBrush(color),
-                Stroke = new SolidColorBrush(Colors.LightBlue),
+                Stroke = new SolidColorBrush(Constants.PointBorderColor),
                 StrokeThickness = 3
             };
 
