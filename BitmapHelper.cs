@@ -113,12 +113,12 @@ namespace LaptopOrchestra.Kinect
                 }
 
                 // We assume all drawn bones are inferred unless BOTH joints are tracked
-                Color drawColor = Constants.InferredBoneColor;
+                Color drawColor = Constants.InferredColor;
 
                 if (isFirst && (joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
                 {
                     //TODO change this depending on body number; pass in the pen
-                    drawColor = Constants.TrackedBoneColor;
+                    drawColor = Constants.TrackedColor;
                 }
 				else if (!isFirst)
 				{
@@ -142,7 +142,7 @@ namespace LaptopOrchestra.Kinect
 
 				if (isFirst)
 				{
-					canvas.DrawPoint(point, isTracked ? Constants.TrackedJointColor : Constants.InferredJointColor);
+					canvas.DrawPoint(point, isTracked ? Constants.TrackedColor : Constants.InferredColor);
 				}
                 else if (!isFirst)
 				{
