@@ -40,8 +40,7 @@ namespace LaptopOrchestra.Kinect
 
         #region Drawing
 
-        public static void DrawSkeleton(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints,
-            Dictionary<JointType, bool> configurationFlags)
+        public static void DrawSkeleton(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints, bool isFirst)
         {
             if (body == null) return;
 
@@ -82,13 +81,13 @@ namespace LaptopOrchestra.Kinect
             bones.Add(new Tuple<JointType, JointType>(JointType.KneeLeft, JointType.AnkleLeft));
             bones.Add(new Tuple<JointType, JointType>(JointType.AnkleLeft, JointType.FootLeft));
                 
-            canvas.DrawBones(body, jointPoints, bones);
-            canvas.DrawJoints(body, jointPoints);
-            canvas.DrawHand(jointPoints[JointType.HandLeft], body.HandLeftState);
-            canvas.DrawHand(jointPoints[JointType.HandRight], body.HandRightState);
+            canvas.DrawBones(body, jointPoints, bones, isFirst);
+            canvas.DrawJoints(body, jointPoints, isFirst);
+            canvas.DrawHand(jointPoints[JointType.HandLeft], body.HandLeftState, isFirst);
+            canvas.DrawHand(jointPoints[JointType.HandRight], body.HandRightState, isFirst);
         }
 
-        private static void DrawBones(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints, List<Tuple<JointType, JointType>> bones)
+        private static void DrawBones(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints, List<Tuple<JointType, JointType>> bones, bool isFirst)
         {
             foreach (var bone in bones)
             {
@@ -116,20 +115,23 @@ namespace LaptopOrchestra.Kinect
                 // We assume all drawn bones are inferred unless BOTH joints are tracked
                 Color drawColor = Constants.InferredBoneColor;
 
-                if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
+                if (isFirst && (joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
                 {
                     //TODO change this depending on body number; pass in the pen
-                    drawColor = Color.FromArgb(255, 255, 0, 0);
+                    drawColor = Constants.TrackedBoneColor;
                 }
+				else
+				{
+					drawColor = Constants.UntrackedBodyColor;
+				}
 
                 // Draw a line to represent the bones
-
                 canvas.DrawLine(jointPoints[jointType0], jointPoints[jointType1], drawColor);
             }
         }
 
-        private static void DrawJoints(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints) {
-
+        private static void DrawJoints(this Canvas canvas, Body body, Dictionary<JointType, Point> jointPoints, bool isFirst)
+		{
             foreach (var joint in jointPoints.Keys)
             {
                 if (jointPoints[joint].X.Equals(double.NegativeInfinity) ||
@@ -138,29 +140,43 @@ namespace LaptopOrchestra.Kinect
                 var isTracked = body.Joints[joint].TrackingState != TrackingState.Tracked;
                 var point = jointPoints[joint];
 
-                canvas.DrawPoint(point , isTracked ? Colors.ForestGreen : Colors.LightSalmon);
+				if (isFirst)
+				{
+					canvas.DrawPoint(point, isTracked ? Constants.TrackedJointColor : Constants.UntrackedJointColor);
+				}
+                else
+				{
+					canvas.DrawPoint(point, Constants.UntrackedBodyColor);
+				}
             }
 
         }
 
-        private static void DrawHand(this Canvas canvas, Point handPosition, HandState handState)
+        private static void DrawHand(this Canvas canvas, Point handPosition, HandState handState, bool isFirst)
         {
             double handSize = 90;
 
-            switch (handState)
-            {
-                case HandState.Closed:
-                    canvas.DrawPoint(handPosition, Constants.HandClosedBrush, handSize);
-                    break;
+			if (isFirst)
+			{
+				switch (handState)
+				{
+					case HandState.Closed:
+						canvas.DrawPoint(handPosition, Constants.HandClosedBrush, handSize);
+						break;
 
-                case HandState.Open:
-                    canvas.DrawPoint(handPosition, Constants.HandOpenBrush, handSize);
-                    break;
+					case HandState.Open:
+						canvas.DrawPoint(handPosition, Constants.HandOpenBrush, handSize);
+						break;
 
-                case HandState.Lasso:
-                    canvas.DrawPoint(handPosition, Constants.HandLassoBrush, handSize);
-                    break;
-            }
+					case HandState.Lasso:
+						canvas.DrawPoint(handPosition, Constants.HandLassoBrush, handSize);
+						break;
+				}
+			}
+			else
+			{
+				canvas.DrawPoint(handPosition, Constants.UntrackedBodyColor, handSize);
+			}
         }
 
         #endregion

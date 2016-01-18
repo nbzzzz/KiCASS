@@ -147,6 +147,7 @@ namespace LaptopOrchestra.Kinect
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
+			bool isFirst = true;
             var reference = e.FrameReference.AcquireFrame();
 
             // Draw the Image from the Camera
@@ -193,22 +194,8 @@ namespace LaptopOrchestra.Kinect
                         alignedJointPoints[jointType] = new Point(colorPoint.X, colorPoint.Y);
                     }
 
-                    TabData ti = tabControl.SelectedItem as TabData;
-                    if ( ti != null )
-                    {                       
-                        string id = ti.Header;
-                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, _localSessions[_localSessions.IndexOf(ti)].displayFlags);
-                    }
-					else                  
-                    {
-                        var jointTypes = Enum.GetValues(typeof(JointType));
-                        Dictionary<JointType, bool> displayFlags = new Dictionary<JointType, bool>();
-                        foreach (JointType jt in jointTypes)
-                        {                            
-                            displayFlags[jt] = true;
-                        }
-                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, displayFlags);
-                    }
+                    XAMLCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
+					isFirst = false;
                 }
             }
         }
