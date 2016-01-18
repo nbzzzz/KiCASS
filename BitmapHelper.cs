@@ -137,7 +137,7 @@ namespace LaptopOrchestra.Kinect
                 if (jointPoints[joint].X.Equals(double.NegativeInfinity) ||
                     jointPoints[joint].Y.Equals(double.NegativeInfinity)) return;
 
-                var isTracked = body.Joints[joint].TrackingState != TrackingState.Tracked;
+                var isTracked = body.Joints[joint].TrackingState == TrackingState.Tracked;
                 var point = jointPoints[joint];
 
 				if (isFirst)
