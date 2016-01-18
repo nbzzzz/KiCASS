@@ -36,7 +36,7 @@ namespace LaptopOrchestra.Kinect
 		{
 			var address = Constants.OscHandStateAddr;
 
-			return new OscMessage(address, leftHand, rightHand);
+			return new OscMessage(address, (int)leftHand, (int)rightHand);
 		}
 	}
 }

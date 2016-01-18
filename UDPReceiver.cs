@@ -36,13 +36,15 @@ namespace LaptopOrchestra.Kinect
 					// this will block until one arrives or the socket is closed
 					OscPacket packet = _receiver.Receive();
 
+				    Console.WriteLine(packet);
+
 					// parse the message
 					string[] msg = OscDeserializer.ParseOscPacket(packet);
 					string[] msgAddress = OscDeserializer.GetMessageAddress(msg);
 
 					var ip = OscDeserializer.GetMessageIp(msg);
 					var port = OscDeserializer.GetMessagePort(msg);
-					var binSeq = OscDeserializer.GetMessageBinSeq(msg);
+
 
 					// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
 					SessionWorker session = CheckSession(ip, port);
@@ -54,7 +56,16 @@ namespace LaptopOrchestra.Kinect
 						session.SetTimers();
 					}
 
-					session.SetJointFlags(binSeq);
+				    if (msgAddress[1] == "joint")
+				    {
+				        var binSeq = OscDeserializer.GetMessageBinSeq(msg);
+                        session.SetJointFlags(binSeq);
+                    }
+				    else if (msgAddress[1] == "handstate")
+				    {
+                        var handStateFlag = OscDeserializer.GetMessageHandStateFlag(msg);
+                        session.SetHandFlag(handStateFlag);
+                    }
 				}
 			}
 		}

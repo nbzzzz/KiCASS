@@ -14,7 +14,6 @@ namespace LaptopOrchestra.Kinect
 		private int _port;
 		private string _ip;
 		private ConfigFlags _configFlags;
-		private ConfigFlags _lookupFlags;
 		private ConfigFlags _flagIterator;
 		private System.Timers.Timer _configTimer;
 		private bool _endSession;
@@ -62,7 +61,6 @@ namespace LaptopOrchestra.Kinect
 			_sessionManager = sessionManager;
 			_dataPub = dataPub;
 			_configFlags = new ConfigFlags();
-			_lookupFlags = new ConfigFlags();
 			_flagIterator = new ConfigFlags();
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
 		}
@@ -100,12 +98,20 @@ namespace LaptopOrchestra.Kinect
 		    sessionRetries = 0;
 		}
 
-		private void CloseSession()
+
+        public void SetHandFlag(bool handStateFlag)
+        {
+            _configFlags.HandStateFlag = handStateFlag;
+            		    sessionRetries = 0;
+        }
+
+        private void CloseSession()
 		{
 			_configTimer.Stop();
 			_configTimer.Close();
 			_udpSender.StopDataOut();
 			GC.Collect();
 		}
+
 	}
 }

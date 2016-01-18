@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Kinect;
 
@@ -55,8 +56,8 @@ namespace LaptopOrchestra.Kinect
 
                     if (_configurationFlags.HandStateFlag)
                     {
-                        var jointMessage = OscSerializer.BuildHandStateMessage(body.HandLeftState, body.HandRightState);
-                        _dataSender.SendMessage(jointMessage);
+                        var handMessage = OscSerializer.BuildHandStateMessage(body.HandLeftState, body.HandRightState);
+                        _dataSender.SendMessage(handMessage);
                     }
 
 					return;

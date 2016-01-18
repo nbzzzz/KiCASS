@@ -90,6 +90,11 @@ namespace LaptopOrchestra.Kinect
                         jointList.Add(jt.ToString());
                     }
                 }
+
+                if (flags.HandStateFlag)
+                {
+                    jointList.Add("HandState");
+                }
                     
                 // If this session already exists update the flags
                 if (_localSessions.Exists(tab => tab.Header == id))

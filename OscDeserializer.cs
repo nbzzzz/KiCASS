@@ -42,5 +42,10 @@ namespace LaptopOrchestra.Kinect
 
 			return binSeq;
 		}
-	}
+
+        public static bool GetMessageHandStateFlag(string[] msg)
+        {
+            return msg[3] == "True";
+        }
+    }
 }
