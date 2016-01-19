@@ -56,10 +56,10 @@ The system is composed of three modules:
 
 - *KiCASS-desktop*
  - Windows desktop program that interfaces with the sensor, grabbing the relevant positional data of the performer
- -  it also interfaces with the Max patch, receiving requests and responding with the requested data in [OSC format](http://archive.cnmat.berkeley.edu/OpenSoundControl/).
+ - interfaces with the Max patch, receiving requests and responding with the requested data in [OSC format](http://archive.cnmat.berkeley.edu/OpenSoundControl/).
 
-- KiCASS-patch
- - Max patch that allows the user to remotely request and receive live OSC data from the KiCASS-desktop program.
+- *KiCASS-patch*
+ - Max patch that allows the user to remotely request and receive live OSC data from KiCASS-desktop
 
 ![kicass-topology](http://i.imgur.com/ISos9bh.png)
 
@@ -97,40 +97,51 @@ The system is composed of three modules:
 
 #### Kinect Requirements
 
-- Windows 8, 8.1, or 10
+- Windows 8, 8.1, or 10*
 - USB 3.0 port
-- 4GB RAM
-- Intel i5 4200, or higher/equivalent processor
+- 4GB+ RAM
+- DX11-capable graphics adapter
+- [Kinect for Windows Runtime 2.0](https://www.microsoft.com/en-ca/download/details.aspx?id=44559)
 
-Note: The Microsoft Kinect v2 was not designed to support Windows 7. [Read more](https://support.xbox.com/en-US/xbox-on-windows/accessories/kinect-for-windows-v2-known-issues) about the Kinect's hardware requirements.
-
+**Unfortunately, Windows 7 is not supported by the latest Kinect runtime. Please refer to the [System Requirements](https://www.microsoft.com/en-ca/download/details.aspx?id=44559&e6b34bbe-475b-1abd-2c51-b5034bcdd6d2=True) for more details.*
 
 #### Download KiCASS-desktop
 
-The latest stable release can be downloaded at (download link here). Or, build the latest version on Github using [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs). Archived releases can be found in the Builds folder.
+- [download]() the latest stable release, or
+- build the latest version using [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs)
+
+*Archived releases can be found in the Builds folder.*
 
 #### Using KiCASS-desktop
 
-- Unzip and run the KiCASS executable.
+- unzip and run the KiCASS executable.
 - make sure the Kinect is powered on, and plug in the USB to your computer.
+- KiCASS-desktop is now live, awaiting Max users to send a connection request.
 
 ![kicass-desktop-image](http://i.imgur.com/MsWsYDn.png)
 
 #### Troubleshooting
-todo
+
+[Here](https://support.xbox.com/en-US/xbox-on-windows/accessories/kinect-for-windows-v2-known-issues) are the most common hardware issues with the Kinect v2 sensor.
 
 ---
 
 ## KiCASS-patch
 
-*Note: We assume the user has a basic understanding of the [Max](https://cycling74.com/products/max/) software environment.*
+[Download](https://cycling74.com/products/max/) and [learn more](https://cycling74.com/wiki/index.php?title=Main_Page) about Max.
 
 #### Max Requirements 
-[Max requirements](https://cycling74.com/downloads/sys-reqs/#.Vp3eM1lyzR8).
 
-#### Download
+- Intel Mac (OS X 10.7 or later) OR Windows PC (Windows 7 or later)
+- Multicore processor
+- 2 GB RAM
+- 1024×768 display
 
-Download the latest release of KiCASS-patch (here: insert link).
+Full system requirements [here](https://cycling74.com/downloads/sys-reqs/#.Vp3eM1lyzR8).
+
+#### Download KiCASS-patch
+
+- [download]() the latest stable release
 
 #### Using the Patch
 
