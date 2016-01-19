@@ -57,11 +57,7 @@ namespace LaptopOrchestra.Kinect
 
         private void TimerTick(object state)
         {
-            // If flag updating thread is still running skip
-            if (!_thread.IsAlive)            {
-                _thread = new Thread(updateFlags);
-                _thread.Start();
-            }
+            updateFlags();
         }
 
         private void updateFlags()
@@ -138,11 +134,6 @@ namespace LaptopOrchestra.Kinect
                 // Restore selection
                 tabControl.SelectedIndex = currentSelected;
             }));
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            //TODO subscribe KinectProcess.Stop() and UDP.stop() to this event; maybe this can go inside App.xaml.cs instead
         }
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
