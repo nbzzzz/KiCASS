@@ -4,8 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Kinect;
 using System.ComponentModel;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Timers;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -37,7 +38,6 @@ namespace LaptopOrchestra.Kinect
         private SessionManager _sessionManager;
 
         private Timer _timer;
-        private Thread _thread;
 
         public ConfigurationTool(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
@@ -50,19 +50,16 @@ namespace LaptopOrchestra.Kinect
             _localSessions = new List<TabData>();
             _tabList = new TabList();
 
-            // Start timer for flag updating thread
-            _timer = new Timer(TimerTick, null, 0, 100);
-            _thread = new Thread(updateFlags);
+			// Start timer for flag updating thread
+			_timer = new Timer(100);
+			_timer.Elapsed += _timer_Elapsed;
+			_timer.Start();
         }
 
-        private void TimerTick(object state)
-        {
-            // If flag updating thread is still running skip
-            if (!_thread.IsAlive)            {
-                _thread = new Thread(updateFlags);
-                _thread.Start();
-            }
-        }
+		private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			updateFlags();
+		}
 
         private void updateFlags()
         {
