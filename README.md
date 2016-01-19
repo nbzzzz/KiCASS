@@ -1,7 +1,7 @@
 # KiCASS: Kinect-Controlled Artistic Sensing System
 
 
-Please note that this is a work in progress; new things are being added every day. Thanks!
+Please note that this guide is a work in progress; new things are being added every day. Thanks!
 
 ---
 
@@ -114,6 +114,8 @@ The latest stable release can be downloaded at (download link here). Or, build t
 - Unzip and run the KiCASS executable.
 - make sure the Kinect is powered on, and plug in the USB to your computer.
 
+![kicass-desktop-image](http://i.imgur.com/MsWsYDn.png)
+
 #### Troubleshooting
 todo
 
@@ -137,7 +139,7 @@ Download the latest release of KiCASS-patch (here: insert link).
 - the default port number can be left as-is
 - check "Metro" and "Display Data", then press "start
 
-![KiCASS-patch-image](http://i.imgur.com/GnrcsSD.png)
+![KiCASS-patch-image](http://i.imgur.com/Tm1Q3uz.png)
 
 ---
 
