@@ -97,17 +97,20 @@ The system is composed of three modules:
 
 #### Kinect Requirements
 
-- Windows 8, 8.1, or 10
+- Windows 8, 8.1, or 10*
 - USB 3.0 port
 - 4GB+ RAM
 - DX11-capable graphics adapter
 - [Kinect for Windows Runtime 2.0](https://www.microsoft.com/en-ca/download/details.aspx?id=44559)
 
-*Unfortunately, Windows 7 is not supported by the latest Kinect runtime. Please refer to the "System Requirements" tab in the above link for more details.
+**Unfortunately, Windows 7 is not supported by the latest Kinect runtime. Please refer to the [System Requirements](https://www.microsoft.com/en-ca/download/details.aspx?id=44559&e6b34bbe-475b-1abd-2c51-b5034bcdd6d2=True) for more details.*
 
 #### Download KiCASS-desktop
 
-The latest stable release can be downloaded at (download link here). Or, build the latest version on Github using [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs). Archived releases can be found in the Builds folder.
+- [download]() the latest stable release, or
+- build the latest version using [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs)
+
+*Archived releases can be found in the Builds folder.*
 
 #### Using KiCASS-desktop
 
@@ -138,7 +141,7 @@ Full system requirements [here](https://cycling74.com/downloads/sys-reqs/#.Vp3eM
 
 #### Download KiCASS-patch
 
-Download the latest release of KiCASS-patch (here: insert link).
+- [download]() the latest stable release
 
 #### Using the Patch
 
