@@ -4,15 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
 	public class ConfigFlags
 	{
 		private Dictionary<JointType, bool> _configFlags;
-		private List<Tuple<JointType, JointType>> _distanceFlags;
+        private Dictionary<HandType, bool> _handStateFlags;
+        private List<Tuple<JointType, JointType>> _distanceFlags;
 		private List<Tuple<JointType, JointType>> _vectorFlags;
-		private bool _handStateFlags;
+
 
 		public Dictionary<JointType, bool> JointFlags
 		{
@@ -32,7 +34,7 @@ namespace LaptopOrchestra.Kinect
 			set { _vectorFlags = value; }
 		}
 
-		public bool HandStateFlag
+        public Dictionary<HandType, bool> HandStateFlag
 		{
 			get { return _handStateFlags; }
 			set { _handStateFlags = value; }
@@ -43,7 +45,7 @@ namespace LaptopOrchestra.Kinect
 			_configFlags = InitJointFlags(_configFlags);
 			_distanceFlags = new List<Tuple<JointType, JointType>>();
 			_vectorFlags = new List<Tuple<JointType, JointType>>();
-		    _handStateFlags = false; 
+		    _handStateFlags = InitHandFlags(_handStateFlags); ; 
         }
 
 		private Dictionary<JointType, bool> InitJointFlags(Dictionary<JointType, bool> flags)
@@ -60,9 +62,23 @@ namespace LaptopOrchestra.Kinect
 			return flags;
 		}
 
-		public bool IfAnyConfig()
+        private Dictionary<HandType, bool> InitHandFlags(Dictionary<HandType, bool> flags)
+        {
+            var handTypes = Enum.GetValues(typeof(JointType));
+
+            flags = new Dictionary<HandType, bool>();
+
+            foreach (HandType ht in handTypes)
+            {
+                flags[ht] = false;
+            }
+
+            return flags;
+        }
+
+        public bool IfAnyConfig()
 		{
-			return _configFlags.Any(x => x.Value == true) || _handStateFlags == true || _distanceFlags.Any() || _vectorFlags.Any();
+			return _configFlags.Any(x => x.Value == true) || _handStateFlags.Any(x => x.Value == true) || _distanceFlags.Any() || _vectorFlags.Any();
         }
 	}
 }

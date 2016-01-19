@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -64,6 +65,7 @@ namespace LaptopOrchestra.Kinect
         private void updateFlags()
         {
             var jointTypes = Enum.GetValues(typeof(JointType));
+            var handTypes = Enum.GetValues(typeof(HandType));
 
             // Copy session workers so iteration doesnt break the collection
             SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
@@ -88,11 +90,10 @@ namespace LaptopOrchestra.Kinect
                     }
                 }
 
-                if (flags.HandStateFlag)
-                {
-                    jointList.Add("HandState");
-                }
-                    
+                //Get the active Handstate flags
+                if(flags.HandStateFlag[HandType.LEFT]) jointList.Add("LeftHandState");
+                if (flags.HandStateFlag[HandType.RIGHT]) jointList.Add("RightHandState");
+
                 // If this session already exists update the flags
                 if (_localSessions.Exists(tab => tab.Header == id))
                 {

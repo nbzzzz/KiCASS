@@ -44,15 +44,18 @@ namespace LaptopOrchestra.Kinect
 			return binSeq;
 		}
 
-        public static bool GetMessageHandStateFlag(string[] msg)
+        public static char[] GetMessageHandStateFlag(string[] msg)
         {
-            return msg[3] == "True";
+            char[] handStateFlags = msg[3].Replace("\"", "").ToCharArray();
+            Array.Reverse(handStateFlags);
+
+            return handStateFlags;
         }
 
 	    public static bool IsValid(OscPacket packet)
 	    {
 	        string packetString = packet.ToString();
-            string pattern = @"\/kinect\/(joint|handstate), ""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"", ([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]), (""[10]{25}""|(True|False))";
+            string pattern = @"\/kinect\/(joint|handstate), ""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"", ([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]), ""([10]{2}|[10]{25})""";
 
             // Instantiate the regular expression object.
             Regex r = new Regex(pattern, RegexOptions.IgnoreCase);

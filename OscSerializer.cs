@@ -32,11 +32,18 @@ namespace LaptopOrchestra.Kinect
 			return new OscMessage(address, absDist);
         }
 
-		public static OscMessage BuildHandStateMessage(HandState leftHand, HandState rightHand)
-		{
-			var address = Constants.OscHandStateAddr;
+        public static OscMessage BuildLeftHandStateMessage(HandState handState)
+        {
+            var address = Constants.OscLeftHandStateAddr;
 
-			return new OscMessage(address, (int)leftHand, (int)rightHand);
-		}
-	}
+            return new OscMessage(address, (int)handState);
+        }
+
+        public static OscMessage BuildRightHandStateMessage(HandState handState)
+        {
+            var address = Constants.OscRightHandStateAddr;
+
+            return new OscMessage(address, (int)handState);
+        }
+    }
 }

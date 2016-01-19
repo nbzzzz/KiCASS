@@ -14,8 +14,9 @@ namespace LaptopOrchestra.Kinect
 		public const string OscDistanceAddr = "/kinect/distance/{0}/{1}";
 		public const string OscVectorAddr = "/kinect/vector/{0}/{1}";
 		public const string OscJointAddr = "/kinect/joint/{0}";
-		public const string OscHandStateAddr = "/kinect/handstate";
-		public const char CharTrue = '1';
+		public const string OscLeftHandStateAddr = "/kinect/handstate/left";
+        public const string OscRightHandStateAddr = "/kinect/handstate/right";
+        public const char CharTrue = '1';
 		public const char CharFalse = '0';
 	    public static int MaxSessionRetries = 2;
 		public static readonly Color HandClosedBrush = Color.FromArgb(128, 255, 0, 0);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -55,9 +56,15 @@ namespace LaptopOrchestra.Kinect
                         _dataSender.SendMessage(jointMessage);
                     }
 
-                    if (_configurationFlags.HandStateFlag)
+
+                    if (_configurationFlags.HandStateFlag[HandType.LEFT])
                     {
-                        var handMessage = OscSerializer.BuildHandStateMessage(body.HandLeftState, body.HandRightState);
+                        var handMessage = OscSerializer.BuildLeftHandStateMessage(body.HandLeftState);
+                        _dataSender.SendMessage(handMessage);
+                    }
+                    if (_configurationFlags.HandStateFlag[HandType.RIGHT])
+                    {
+                        var handMessage = OscSerializer.BuildRightHandStateMessage(body.HandLeftState);
                         _dataSender.SendMessage(handMessage);
                     }
 

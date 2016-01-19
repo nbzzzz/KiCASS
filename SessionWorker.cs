@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -83,12 +84,12 @@ namespace LaptopOrchestra.Kinect
             }
 		}
 
-		public void SetJointFlags(char[] address)
+		public void SetJointFlags(char[] binarySequence)
 		{
-            Logger.Debug("Setting joint flags to " + address + "for " + Ip + ":" + "Port");
+            Logger.Debug("Setting joint flags to " + binarySequence + " for " + Ip + ":" + Port);
             foreach (var key in _flagIterator.JointFlags.Keys)
 			{
-				if (address[(int)key] == Constants.CharTrue)
+				if (binarySequence[(int)key] == Constants.CharTrue)
 				{
                     _configFlags.JointFlags[key] = true;
 				}
@@ -101,11 +102,13 @@ namespace LaptopOrchestra.Kinect
 		}
 
 
-        public void SetHandFlag(bool handStateFlag)
+        public void SetHandFlag(char[] binarySequence)
         {
-            Logger.Debug("Setting hand flag to " + handStateFlag + "for " + Ip + ":" + "Port");
-            _configFlags.HandStateFlag = handStateFlag;
-            		    sessionRetries = 0;
+            //NOTE Lefthand will be left bit; right hand will be right bit
+            Logger.Debug("Setting hand flag to " + binarySequence + " for " + Ip + ":" + Port);
+            _configFlags.HandStateFlag[HandType.LEFT] = (binarySequence[0] == Constants.CharTrue);
+            _configFlags.HandStateFlag[HandType.RIGHT] = (binarySequence[1] == Constants.CharTrue);
+            sessionRetries = 0;
         }
 
         private void CloseSession()
