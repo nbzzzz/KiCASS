@@ -4,6 +4,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using log4net.Config;
@@ -24,6 +25,16 @@ namespace LaptopOrchestra.Kinect
         public Dictionary<JointType, bool> ConfigurationFlags;
 
         /// <summary>
+        ///      Kinect 2.0 object that publishes new data
+        /// </summary>
+        public KinectProcessor KinectProcessor;
+
+        /// <summary>
+        ///     Manages the active connections to KiCASS
+        /// </summary>
+        public SessionManager SessionManager;
+
+        /// <summary>
         ///     Execute start up tasks
         /// </summary>
         /// <param name="sender">object sending the event</param>
@@ -38,26 +49,28 @@ namespace LaptopOrchestra.Kinect
 
             ConfigurationFlags = new Dictionary<JointType, bool>();
 
+            KinectProcessor = new KinectProcessor();
 
-            // TODO: Add a flag to start up the simulator if desired -- should be a flag passable somehow @ app startup
-            /*KinectSimulator kinectSimulator = new KinectSimulator(this.queue);
-            kinectSimulator.Top = 200;
-            kinectSimulator.Left = 600;
-            kinectSimulator.Show();*/
+			SessionManager = new SessionManager();
 
-            var kinectProcessor = new KinectProcessor();
-
-			var sessionManager = new SessionManager();
-
-			var udpReceiver = new UDPReceiver(8080, sessionManager, kinectProcessor);
+			var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
 
             // Initialize main GUI
-            var configurationTool = new ConfigurationTool(sessionManager, kinectProcessor)
+            var configurationTool = new ConfigurationTool(SessionManager, KinectProcessor)
             {
                 Top = 0,
                 Left = 0
             };
             configurationTool.Show();
+        }
+
+        private void App_Exit(object sender, ExitEventArgs e)
+        {
+            Logger.Info("Closing Connections");
+            SessionManager.CloseAllConnections();
+            Logger.Info("Shut down Kinect");
+            KinectProcessor.StopKinect();
+            Logger.Info("KiCASS Exited Succesfully");
         }
     }
 }

@@ -31,5 +31,19 @@ namespace LaptopOrchestra.Kinect
 			var absDist = Math.Sqrt(xDist * xDist + yDist * yDist* + zDist * zDist);
 			return new OscMessage(address, absDist);
         }
-	}
+
+        public static OscMessage BuildLeftHandStateMessage(HandState handState)
+        {
+            var address = Constants.OscLeftHandStateAddr;
+
+            return new OscMessage(address, (int)handState);
+        }
+
+        public static OscMessage BuildRightHandStateMessage(HandState handState)
+        {
+            var address = Constants.OscRightHandStateAddr;
+
+            return new OscMessage(address, (int)handState);
+        }
+    }
 }

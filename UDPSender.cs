@@ -36,7 +36,7 @@ public class UDPSender
         catch (Exception e)
         {
             Console.WriteLine(e.ToString());
-            Logger.Debug(e.Message);
+            Logger.Error(e.Message);
         }
     }
 

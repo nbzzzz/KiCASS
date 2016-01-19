@@ -14,13 +14,16 @@ namespace LaptopOrchestra.Kinect
 		public const string OscDistanceAddr = "/kinect/distance/{0}/{1}";
 		public const string OscVectorAddr = "/kinect/vector/{0}/{1}";
 		public const string OscJointAddr = "/kinect/joint/{0}";
-		public const char CharTrue = '1';
+		public const string OscLeftHandStateAddr = "/kinect/handstate/left";
+        public const string OscRightHandStateAddr = "/kinect/handstate/right";
+        public const char CharTrue = '1';
 		public const char CharFalse = '0';
+	    public static int MaxSessionRetries = 2;
 		public static readonly Color HandClosedBrush = Color.FromArgb(128, 255, 0, 0);
 		public static readonly Color HandOpenBrush = Color.FromArgb(128, 0, 255, 0);
 		public static readonly Color HandLassoBrush = Color.FromArgb(128, 0, 0, 255);
-		public static readonly Color TrackedJointColor = Color.FromArgb(255, 68, 192, 68);
-		public static readonly Color InferredJointColor = Color.FromArgb(255, 255, 255, 0);
-		public static readonly Color InferredBoneColor = Color.FromArgb(255, 60, 60, 60);
+		public static readonly Color TrackedColor = Colors.ForestGreen;
+        public static readonly Color InferredColor = Color.FromArgb(255, 100, 100, 100);
+		public static readonly Color UntrackedBodyColor = Color.FromArgb(255, 50, 50, 50);
 	}
 }
