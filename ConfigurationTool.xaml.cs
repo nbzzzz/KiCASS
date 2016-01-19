@@ -6,6 +6,7 @@ using Microsoft.Kinect;
 using System.ComponentModel;
 using System.Threading;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace LaptopOrchestra.Kinect
 {

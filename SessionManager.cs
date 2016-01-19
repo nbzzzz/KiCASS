@@ -28,7 +28,8 @@ namespace LaptopOrchestra.Kinect
 
 		public void CloseAllConnections()
 		{
-			foreach (var session in _openConnections)
+            Logger.Info("Closing all sessions");
+            foreach (var session in _openConnections)
 			{
 				session.EndSession = true;
 			}
@@ -41,6 +42,8 @@ namespace LaptopOrchestra.Kinect
 			{
 				if (_openConnections[i].EndSession)
 				{
+				    var session = _openConnections[i];
+                    Logger.Info("Removing " + session.Ip + ":" + session.Port + " from session manager");
 					_openConnections.RemoveAt(i);
 				}
 			}

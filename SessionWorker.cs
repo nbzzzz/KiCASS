@@ -78,13 +78,15 @@ namespace LaptopOrchestra.Kinect
 
             if (sessionRetries > Constants.MaxSessionRetries)
             {
+                Logger.Info("Have not recieved messages from " + Ip + ":" + Port + " for " + Constants.MaxSessionRetries*Constants.SessionRecvConfigInterval + " terminating session");
                 EndSession = true;
             }
 		}
 
 		public void SetJointFlags(char[] address)
 		{
-			foreach (var key in _flagIterator.JointFlags.Keys)
+            Logger.Debug("Setting joint flags to " + address + "for " + Ip + ":" + "Port");
+            foreach (var key in _flagIterator.JointFlags.Keys)
 			{
 				if (address[(int)key] == Constants.CharTrue)
 				{
@@ -101,6 +103,7 @@ namespace LaptopOrchestra.Kinect
 
         public void SetHandFlag(bool handStateFlag)
         {
+            Logger.Debug("Setting hand flag to " + handStateFlag + "for " + Ip + ":" + "Port");
             _configFlags.HandStateFlag = handStateFlag;
             		    sessionRetries = 0;
         }
