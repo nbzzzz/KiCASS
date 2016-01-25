@@ -41,7 +41,7 @@ namespace LaptopOrchestra.Kinect
 
         #region Event handlers
 
-        private void StopKinect()
+        public void StopKinect()
         {
             Reader?.Dispose();
 

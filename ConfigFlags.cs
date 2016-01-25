@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
 	public class ConfigFlags
 	{
 		private Dictionary<JointType, bool> _configFlags;
-		private List<Tuple<JointType, JointType>> _distanceFlags;
+        private Dictionary<HandType, bool> _handStateFlags;
+        private List<Tuple<JointType, JointType>> _distanceFlags;
 		private List<Tuple<JointType, JointType>> _vectorFlags;
+
 
 		public Dictionary<JointType, bool> JointFlags
 		{
@@ -31,14 +34,21 @@ namespace LaptopOrchestra.Kinect
 			set { _vectorFlags = value; }
 		}
 
+        public Dictionary<HandType, bool> HandStateFlag
+		{
+			get { return _handStateFlags; }
+			set { _handStateFlags = value; }
+		}
+
 		public ConfigFlags()
 		{
-			_configFlags = InitFlags(_configFlags);
+			_configFlags = InitJointFlags(_configFlags);
 			_distanceFlags = new List<Tuple<JointType, JointType>>();
 			_vectorFlags = new List<Tuple<JointType, JointType>>();
+		    _handStateFlags = InitHandFlags(_handStateFlags); ; 
         }
 
-		private Dictionary<JointType, bool> InitFlags(Dictionary<JointType, bool> flags)
+		private Dictionary<JointType, bool> InitJointFlags(Dictionary<JointType, bool> flags)
 		{
 			var jointTypes = Enum.GetValues(typeof(JointType));
 
@@ -51,5 +61,24 @@ namespace LaptopOrchestra.Kinect
 
 			return flags;
 		}
+
+        private Dictionary<HandType, bool> InitHandFlags(Dictionary<HandType, bool> flags)
+        {
+            var handTypes = Enum.GetValues(typeof(JointType));
+
+            flags = new Dictionary<HandType, bool>();
+
+            foreach (HandType ht in handTypes)
+            {
+                flags[ht] = false;
+            }
+
+            return flags;
+        }
+
+        public bool IfAnyConfig()
+		{
+			return _configFlags.Any(x => x.Value == true) || _handStateFlags.Any(x => x.Value == true) || _distanceFlags.Any() || _vectorFlags.Any();
+        }
 	}
 }

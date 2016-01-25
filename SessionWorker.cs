@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -14,10 +15,10 @@ namespace LaptopOrchestra.Kinect
 		private int _port;
 		private string _ip;
 		private ConfigFlags _configFlags;
-		private ConfigFlags _lookupFlags;
 		private ConfigFlags _flagIterator;
 		private System.Timers.Timer _configTimer;
 		private bool _endSession;
+	    private int sessionRetries;
 
 		public int Port
 		{
@@ -32,11 +33,6 @@ namespace LaptopOrchestra.Kinect
 		public ConfigFlags ConfigFlags
 		{
 			get { return _configFlags; }
-		}
-
-		public ConfigFlags LookupFlags
-		{
-			get { return _lookupFlags; }
 		}
 
 		public bool EndSession
@@ -66,7 +62,6 @@ namespace LaptopOrchestra.Kinect
 			_sessionManager = sessionManager;
 			_dataPub = dataPub;
 			_configFlags = new ConfigFlags();
-			_lookupFlags = new ConfigFlags();
 			_flagIterator = new ConfigFlags();
 			_dataSub = new DataSubscriber(_configFlags, _dataPub, _udpSender);
 		}
@@ -80,71 +75,49 @@ namespace LaptopOrchestra.Kinect
 
 		private void _configTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
-			if (CheckLookupFlags())
-			{
-				ApplyLookupFlags();
-			}
-			ClearLookupFlags();
+		    sessionRetries++;
+
+            if (sessionRetries > Constants.MaxSessionRetries)
+            {
+                Logger.Info("Have not recieved messages from " + Ip + ":" + Port + " for " + Constants.MaxSessionRetries*Constants.SessionRecvConfigInterval + " terminating session");
+                EndSession = true;
+            }
 		}
 
-		private bool CheckLookupFlags()
+		public void SetJointFlags(char[] binarySequence)
 		{
-			if (!_lookupFlags.JointFlags.Any(x => x.Value == true))
+            Logger.Debug("Setting joint flags to " + binarySequence + " for " + Ip + ":" + Port);
+            foreach (var key in _flagIterator.JointFlags.Keys)
 			{
-				CloseSession();
-				return false;
-			}
-			return true;
-		}
-
-		public void SetLookupFlags(char[] address)
-		{
-			foreach (var key in _flagIterator.JointFlags.Keys)
-			{
-				if (address[(int)key] == Constants.CharTrue)
+				if (binarySequence[(int)key] == Constants.CharTrue)
 				{
-					_lookupFlags.JointFlags[key] = true;
+                    _configFlags.JointFlags[key] = true;
 				}
+				else
+				{
+                    _configFlags.JointFlags[key] = false;
+                }
 			}
-			ApplyLookupFlags();
+		    sessionRetries = 0;
 		}
 
-		private void ClearLookupFlags()
-		{
-			foreach (var key in _flagIterator.JointFlags.Keys)
-			{
-				_lookupFlags.JointFlags[key] = false;
-			}
-		}
 
-		private Dictionary<JointType, bool> InitFlags(Dictionary<JointType, bool> flags)
-		{
-			var jointTypes = Enum.GetValues(typeof(JointType));
+        public void SetHandFlag(char[] binarySequence)
+        {
+            //NOTE Lefthand will be left bit; right hand will be right bit
+            Logger.Debug("Setting hand flag to " + binarySequence + " for " + Ip + ":" + Port);
+            _configFlags.HandStateFlag[HandType.LEFT] = (binarySequence[0] == Constants.CharTrue);
+            _configFlags.HandStateFlag[HandType.RIGHT] = (binarySequence[1] == Constants.CharTrue);
+            sessionRetries = 0;
+        }
 
-			flags = new Dictionary<JointType, bool>();
-
-			foreach (JointType jt in jointTypes)
-			{
-				flags[jt] = false;
-			}
-
-			return flags;
-		}
-
-		private void ApplyLookupFlags()
-		{
-			foreach (KeyValuePair<JointType, bool> pair in _lookupFlags.JointFlags)
-			{
-				_configFlags.JointFlags[pair.Key] = pair.Value;
-			}
-		}
-
-		private void CloseSession()
+        private void CloseSession()
 		{
 			_configTimer.Stop();
 			_configTimer.Close();
 			_udpSender.StopDataOut();
 			GC.Collect();
 		}
+
 	}
 }

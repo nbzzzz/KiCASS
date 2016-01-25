@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Kinect;
-using System.ComponentModel;
-using System.Threading;
-using System.Collections.ObjectModel;
+using Microsoft.Kinect.Input;
+using System.Timers;
+using System.Threading.Tasks;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -37,7 +36,6 @@ namespace LaptopOrchestra.Kinect
         private SessionManager _sessionManager;
 
         private Timer _timer;
-        private Thread _thread;
 
         public ConfigurationTool(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
@@ -50,23 +48,21 @@ namespace LaptopOrchestra.Kinect
             _localSessions = new List<TabData>();
             _tabList = new TabList();
 
-            // Start timer for flag updating thread
-            _timer = new Timer(TimerTick, null, 0, 100);
-            _thread = new Thread(updateFlags);
+			// Start timer for flag updating thread
+			_timer = new Timer(100);
+			_timer.Elapsed += _timer_Elapsed;
+			_timer.Start();
         }
 
-        private void TimerTick(object state)
-        {
-            // If flag updating thread is still running skip
-            if (!_thread.IsAlive)            {
-                _thread = new Thread(updateFlags);
-                _thread.Start();
-            }
-        }
+		private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			updateFlags();
+		}
 
         private void updateFlags()
         {
             var jointTypes = Enum.GetValues(typeof(JointType));
+            var handTypes = Enum.GetValues(typeof(HandType));
 
             // Copy session workers so iteration doesnt break the collection
             SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
@@ -90,7 +86,11 @@ namespace LaptopOrchestra.Kinect
                         jointList.Add(jt.ToString());
                     }
                 }
-                    
+
+                //Get the active Handstate flags
+                if(flags.HandStateFlag[HandType.LEFT]) jointList.Add("LeftHandState");
+                if (flags.HandStateFlag[HandType.RIGHT]) jointList.Add("RightHandState");
+
                 // If this session already exists update the flags
                 if (_localSessions.Exists(tab => tab.Header == id))
                 {
@@ -135,13 +135,9 @@ namespace LaptopOrchestra.Kinect
             }));
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            //TODO subscribe KinectProcess.Stop() and UDP.stop() to this event; maybe this can go inside App.xaml.cs instead
-        }
-
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
+			bool isFirst = true;
             var reference = e.FrameReference.AcquireFrame();
 
             // Draw the Image from the Camera
@@ -188,22 +184,8 @@ namespace LaptopOrchestra.Kinect
                         alignedJointPoints[jointType] = new Point(colorPoint.X, colorPoint.Y);
                     }
 
-                    TabData ti = tabControl.SelectedItem as TabData;
-                    if ( ti != null )
-                    {                       
-                        string id = ti.Header;
-                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, _localSessions[_localSessions.IndexOf(ti)].displayFlags);
-                    }
-					else                  
-                    {
-                        var jointTypes = Enum.GetValues(typeof(JointType));
-                        Dictionary<JointType, bool> displayFlags = new Dictionary<JointType, bool>();
-                        foreach (JointType jt in jointTypes)
-                        {                            
-                            displayFlags[jt] = true;
-                        }
-                        XAMLCanvas.DrawSkeleton(body, alignedJointPoints, displayFlags);
-                    }
+                    XAMLCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
+					isFirst = false;
                 }
             }
         }
