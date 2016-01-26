@@ -47,7 +47,6 @@ namespace LaptopOrchestra.Kinect
         public static char[] GetMessageHandStateFlag(string[] msg)
         {
             char[] handStateFlags = msg[3].Replace("\"", "").ToCharArray();
-            Array.Reverse(handStateFlags);
 
             return handStateFlags;
         }
