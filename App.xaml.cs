@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Windows;
 using log4net.Config;
 using Microsoft.Kinect;
+using System.Windows.Forms;
+using System.ComponentModel;
 
 [assembly: XmlConfigurator(Watch = true)]
 
@@ -17,7 +19,7 @@ namespace LaptopOrchestra.Kinect
     /// <summary>
     ///     Interaction logic for App
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         /// <summary>
         ///     Configuration Items selected
@@ -34,6 +36,11 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         public SessionManager SessionManager;
 
+
+        /// <summary>
+        ///     GUI for managing kinect data
+        /// </summary>
+        public ConfigurationTool configurationTool;
         /// <summary>
         ///     Execute start up tasks
         /// </summary>
@@ -56,21 +63,46 @@ namespace LaptopOrchestra.Kinect
 			var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
 
             // Initialize main GUI
-            var configurationTool = new ConfigurationTool(SessionManager, KinectProcessor)
+            configurationTool = new ConfigurationTool(SessionManager, KinectProcessor)
             {
                 Top = 0,
                 Left = 0
             };
             configurationTool.Show();
+            System.Windows.Application.Current.MainWindow.Closing += new CancelEventHandler(MainWindow_Closing);
+        }        
+
+        public static bool CloseCancel()
+        {
+            const string message = "Are you sure that you would like to close KICASS?";
+            const string caption = "Cancel Installer";
+            var result = System.Windows.Forms.MessageBox.Show(message, caption,
+                             MessageBoxButtons.YesNo,
+                             MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+                return true;
+            else
+                return false;
         }
 
-        private void App_Exit(object sender, ExitEventArgs e)
+        public void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            Logger.Info("Closing Connections");
-            SessionManager.CloseAllConnections();
-            Logger.Info("Shut down Kinect");
-            KinectProcessor.StopKinect();
-            Logger.Info("KiCASS Exited Succesfully");
+            if (CloseCancel())
+            {
+                Logger.Info("Closing Connections");
+                SessionManager.CloseAllConnections();
+                Logger.Info("Shut down Kinect");
+                KinectProcessor.StopKinect();
+                Logger.Info("Kill the update thread in the GUI");
+                configurationTool.KillUpdateThread();
+                Logger.Info("KiCASS Exited Succesfully");
+                e.Cancel = false;
+            }
+            else
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
