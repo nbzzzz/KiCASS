@@ -36,6 +36,7 @@ namespace LaptopOrchestra.Kinect
         private SessionManager _sessionManager;
 
         private Timer _timer;
+        private bool toggle_flag;
 
         public ConfigurationTool(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
@@ -48,6 +49,8 @@ namespace LaptopOrchestra.Kinect
             _localSessions = new List<TabData>();
             _tabList = new TabList();
 
+            toggle_flag = true;
+            
 			// Start timer for flag updating thread
 			_timer = new Timer(100);
 			_timer.Elapsed += _timer_Elapsed;
@@ -137,16 +140,27 @@ namespace LaptopOrchestra.Kinect
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
-			bool isFirst = true;
+            bool isFirst = true;
             var reference = e.FrameReference.AcquireFrame();
 
-            // Draw the Image from the Camera
-            using (var frame = reference.ColorFrameReference.AcquireFrame())
+            //Draw image only if Toggle is ON.
+            if (toggle_flag)
             {
-                if (frame != null)
+                // Draw the Image from the Camera
+                using (var frame = reference.ColorFrameReference.AcquireFrame())
                 {
-                    XAMLImage.Source = frame.ToBitmap();
+                    if (frame != null)
+                    {
+                        XAMLImage.Source = frame.ToBitmap();
+                    }
                 }
+
+            }
+
+            //If Toggle is OFF, clear frame from sight.
+            else
+            {
+                XAMLImage.Source = null;
             }
 
             // Acquire skeleton data as well
@@ -188,6 +202,12 @@ namespace LaptopOrchestra.Kinect
 					isFirst = false;
                 }
             }
+        }
+
+        //
+        private void Toggle_Image(object sender, RoutedEventArgs e)
+        {
+            this.toggle_flag = !this.toggle_flag;
         }
     }
 }

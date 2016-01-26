@@ -33,9 +33,11 @@
 
         <DockPanel DockPanel.Dock="Left" Width="200" Margin="5,0,0,5">
             <Button DockPanel.Dock="Bottom"
+                    Click="Toggle_Image"
                     Content="TOGGLE"
                     Height="200"
-                    Background="#FFE9ECD2" FontSize="48"/>
+                    Background="#FFE9ECD2"
+                    FontSize="48"/>
             <TabControl x:Name="tabControl"
                         ItemsSource="{Binding Source={StaticResource TabListResource}}"
                         ItemTemplate="{StaticResource HeaderTemplate}"
