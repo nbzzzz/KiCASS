@@ -49,8 +49,8 @@ namespace LaptopOrchestra.Kinect
                 {
                     if (body == null || !body.IsTracked) continue;
 
-					var messageCount = 0;
-					OscPacket[] messageFlags = new OscPacket[27];
+					var packetCount = 0;
+					OscPacket[] messagePackets = new OscPacket[27];
 
                     foreach (var joint in body.Joints)
                     {
@@ -58,27 +58,27 @@ namespace LaptopOrchestra.Kinect
 
                         var jointMessage = OscSerializer.BuildJointMessage(joint.Value);
 						//_dataSender.SendMessage(jointMessage);
-						messageFlags[messageCount] = jointMessage;
-						messageCount++;
+						messagePackets[packetCount] = jointMessage;
+						packetCount++;
 					}
 
                     if (_configurationFlags.HandStateFlag[HandType.LEFT])
                     {
                         var handMessage = OscSerializer.BuildLeftHandStateMessage(body.HandLeftState);
 						//_dataSender.SendMessage(handMessage);
-						messageFlags[messageCount] = handMessage;
-						messageCount++;
+						messagePackets[packetCount] = handMessage;
+						packetCount++;
 					}
 
                     if (_configurationFlags.HandStateFlag[HandType.RIGHT])
                     {
                         var handMessage = OscSerializer.BuildRightHandStateMessage(body.HandLeftState);
 						//_dataSender.SendMessage(handMessage);
-						messageFlags[messageCount] = handMessage;
-						messageCount++;
+						messagePackets[packetCount] = handMessage;
+						packetCount++;
 					}
 
-					OscBundle bundle = new OscBundle(DateTime.Now, messageFlags);
+					OscBundle bundle = new OscBundle(DateTime.Now, messagePackets);
 					_dataSender.SendBundle(bundle);
 					return;
                 }
