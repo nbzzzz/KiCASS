@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Input;
+using Rug.Osc;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -48,26 +49,37 @@ namespace LaptopOrchestra.Kinect
                 {
                     if (body == null || !body.IsTracked) continue;
 
+					var messageCount = 0;
+					OscPacket[] messageFlags = new OscPacket[27];
+
                     foreach (var joint in body.Joints)
                     {
                         if (!_configurationFlags.JointFlags[joint.Key]) continue;
 
                         var jointMessage = OscSerializer.BuildJointMessage(joint.Value);
-                        _dataSender.SendMessage(jointMessage);
-                    }
-
+						//_dataSender.SendMessage(jointMessage);
+						messageFlags[messageCount] = jointMessage;
+						messageCount++;
+					}
 
                     if (_configurationFlags.HandStateFlag[HandType.LEFT])
                     {
                         var handMessage = OscSerializer.BuildLeftHandStateMessage(body.HandLeftState);
-                        _dataSender.SendMessage(handMessage);
-                    }
+						//_dataSender.SendMessage(handMessage);
+						messageFlags[messageCount] = handMessage;
+						messageCount++;
+					}
+
                     if (_configurationFlags.HandStateFlag[HandType.RIGHT])
                     {
                         var handMessage = OscSerializer.BuildRightHandStateMessage(body.HandLeftState);
-                        _dataSender.SendMessage(handMessage);
-                    }
+						//_dataSender.SendMessage(handMessage);
+						messageFlags[messageCount] = handMessage;
+						messageCount++;
+					}
 
+					OscBundle bundle = new OscBundle(DateTime.Now, messageFlags);
+					_dataSender.SendBundle(bundle);
 					return;
                 }
             }

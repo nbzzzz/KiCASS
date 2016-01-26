@@ -49,4 +49,9 @@ public class UDPSender
     {
         _sender.Send(message);
     }
+
+	public void SendBundle(OscBundle bundle)
+	{
+		_sender.Send(bundle);
+	}
 }
