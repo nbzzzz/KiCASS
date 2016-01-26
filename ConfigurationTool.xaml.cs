@@ -48,16 +48,21 @@ namespace LaptopOrchestra.Kinect
             _localSessions = new List<TabData>();
             _tabList = new TabList();
 
-			// Start timer for flag updating thread
-			_timer = new Timer(100);
-			_timer.Elapsed += _timer_Elapsed;
-			_timer.Start();
+            // Start timer for flag updating thread
+            _timer = new Timer(100);
+            _timer.Elapsed += _timer_Elapsed;
+            _timer.Start();
         }
 
-		private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-		{
-			updateFlags();
-		}
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            updateFlags();
+        }
+
+        public void KillUpdateThread()
+        {
+            _timer.Close();
+        }
 
         private void updateFlags()
         {
