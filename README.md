@@ -107,7 +107,7 @@ The system is composed of three modules:
 
 #### Download KiCASS-desktop
 
-- [download]() the latest stable release, or
+- [download](https://drive.google.com/folderview?id=0B87LEJT7CsShV0lmclhMN21CWFU&usp=sharing) the latest stable release, or
 - build the latest version using [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs)
 
 *Archived releases can be found in the Builds folder.*
@@ -141,7 +141,7 @@ Full system requirements [here](https://cycling74.com/downloads/sys-reqs/#.Vp3eM
 
 #### Download KiCASS-patch
 
-- [download]() the latest stable release
+- [download](https://drive.google.com/folderview?id=0B87LEJT7CsShV0lmclhMN21CWFU&usp=sharing) the latest stable release
 
 #### Using the Patch
 
