@@ -115,7 +115,7 @@ namespace LaptopOrchestra.Kinect
                 int currentSelected = 0;
                 if (_tabList.getTabs().Count > 1)
                 {
-                    currentSelected = tabControl.SelectedIndex;
+                    //currentSelected = tabControl.SelectedIndex;
                 }
 
                 // Update the list of tabs in the gui
@@ -128,10 +128,10 @@ namespace LaptopOrchestra.Kinect
                     }
                     tab.Active = false;
                 }
-                tabControl.ItemsSource = _tabList;
+                //tabControl.ItemsSource = _tabList;
 
                 // Restore selection
-                tabControl.SelectedIndex = currentSelected;
+                //tabControl.SelectedIndex = currentSelected;
             }));
         }
 

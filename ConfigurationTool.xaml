@@ -3,7 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:src ="clr-namespace:LaptopOrchestra.Kinect"
         
-        Title="KiCASS | UBC Laptop Orchestra" Height="1080" Width="2120" >
+        Title="KiCASS-desktop | UBC Laptop Orchestra"
+        HorizontalAlignment="Center"
+        Width="2400"
+        Height="1200"
+        MinWidth="900"
+        MinHeight="450">
+
+    <!--<Window.Background>
+        <SolidColorBrush Color="Beige"/>
+    </Window.Background>-->
 
     <Window.Resources>
         <ObjectDataProvider x:Key="TabListResource" ObjectType="{x:Type src:TabList}" />
@@ -12,32 +21,40 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ContentTemplate">
-            <ItemsControl ItemsSource="{Binding Path=Items}" FontSize="14" Grid.Column="0"/>            
+            <ItemsControl ItemsSource="{Binding Path=Items}" FontSize="14" Grid.Column="0"/>
         </DataTemplate>
     </Window.Resources>
-    
-    <Viewbox>
-        <DockPanel>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                
-                <TabControl x:Name="tabControl"
-                            ItemsSource="{Binding Source={StaticResource TabListResource}}"
-                            Grid.Column="0" 
-                            ItemTemplate="{StaticResource HeaderTemplate}"
-                            ContentTemplate="{StaticResource ContentTemplate}"
-					        TabStripPlacement="Top" 
-					        Margin="0,0,0,9.667" Width="169" />
 
+    <DockPanel LastChildFill="True">
 
-                <Image Name="XAMLImage" Grid.Column="1"/>
-                
-                <Canvas Name="XAMLCanvas" Grid.Column="1"/>
-            </Grid>
+        <TextBox DockPanel.Dock="Bottom" 
+                     Text="Status: Green"
+                     Background="#FFA0E088" />
+
+        <DockPanel DockPanel.Dock="Left" Width="200" Margin="5,0,0,5">
+            <Button DockPanel.Dock="Bottom"
+                    Content="TOGGLE"
+                    Height="200"
+                    Background="#FFE9ECD2" FontSize="48"/>
+            <TabControl x:Name="tabControl"
+                        ItemsSource="{Binding Source={StaticResource TabListResource}}"
+                        ItemTemplate="{StaticResource HeaderTemplate}"
+                        ContentTemplate="{StaticResource ContentTemplate}"
+                        TabStripPlacement="Top"
+                        Background="#FFE9E2FF"/>
         </DockPanel>
-    </Viewbox>
 
+
+
+        <Grid Margin="5,0,5,5" >
+
+            <Image Name="XAMLImage"/>
+            <Canvas Name="XAMLCanvas" />
+            
+
+
+
+        </Grid>
+
+    </DockPanel>
 </Window>
