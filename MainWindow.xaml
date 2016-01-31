@@ -44,6 +44,7 @@
                 Grid.Column="0">
                 <TextBlock
                     Name="textBlock0"
+                    Text="{Binding CurrentState.BackgroundThreadStatus}"
                     Background="{Binding CurrentState.StatusColor}"
                     TextAlignment="Center"
                     FontSize="16"

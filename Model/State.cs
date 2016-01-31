@@ -3,12 +3,27 @@ using System.Collections.Generic;
 using Microsoft.Kinect;
 using LaptopOrchestra.Kinect.ViewModel;
 using LaptopOrchestra.Kinect.Properties;
+using System.Threading;
+using System.Timers;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect.Model
 {
     public class State : ViewModelBase
     {
         #region Properties
+
+        //Copy of session manager to get open connections
+        private SessionManager _sessionManager;
+
+        //Timer
+        private System.Timers.Timer _timer;
+
+        //List of tabs in gui
+        private TabList _tabList;
+
+        //Local list of tabs
+        List<TabData> _localSessions;
 
         private string _statusTitle;
         public string StatusTitle
@@ -136,9 +151,23 @@ namespace LaptopOrchestra.Kinect.Model
             }
         }
 
+        private string _backgroundThreadStatus;
+        public string BackgroundThreadStatus
+        {
+            get { return _backgroundThreadStatus; }
+            set
+            {
+                if (value != _backgroundThreadStatus)
+                {
+                    _backgroundThreadStatus = value;
+                    OnPropertyChanged("BackgroundThreadStatus");
+                }
+            }
+        }
+
         #endregion //Properties
 
-        #region Creation
+        #region Functions
 
         public static State CreateNewState()
         {
@@ -155,15 +184,71 @@ namespace LaptopOrchestra.Kinect.Model
                 OrientationButtonText = "Orientation: MIRRORED"
             };
         }
-
-        public void UpdateState()
-        {
-            //start thread
-            StatusTitle = "thread runnning";
-        }
-
+    
         protected State() { }
 
-        #endregion // Creation
+        public void UpdateState(SessionManager sessionManager)
+        {
+            _sessionManager = sessionManager;
+            _localSessions = new List<TabData>();
+            _tabList = new TabList();
+
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += _timer_Elapsed;
+            _timer.Start();
+        }
+
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            updateFlags();
+        }
+
+        private void updateFlags()
+        {
+            var jointTypes = Enum.GetValues(typeof(JointType));
+            var handTypes = Enum.GetValues(typeof(HandType));
+
+            // Copy session workers so iteration doesnt break the collection
+            SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
+            _sessionManager.OpenConnections.CopyTo(workers);
+
+            foreach (SessionWorker sw in workers)
+            {
+                // Get the port and IP of this session
+                string id = sw.Ip + ":" + sw.Port.ToString();
+
+                // Copy the flags
+                ConfigFlags flags = sw.ConfigFlags;
+
+                // Get the list of active joints
+                List<string> jointList = new List<string>();
+                foreach (JointType jt in jointTypes)
+                {
+                    if (flags.JointFlags[jt])
+                    {
+                        jointList.Add(jt.ToString());
+                    }
+                }
+
+                //Get the active Handstate flags
+                if (flags.HandStateFlag[HandType.LEFT]) jointList.Add("LeftHandState");
+                if (flags.HandStateFlag[HandType.RIGHT]) jointList.Add("RightHandState");
+
+                // If this session already exists update the flags
+                if (_localSessions.Exists(tab => tab.Header == id))
+                {
+                    _localSessions.Find(tab => tab.Header.Equals(id)).displayFlags = flags.JointFlags;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Items = jointList;
+                    _localSessions.Find(tab => tab.Header.Equals(id)).Active = true;
+                }
+                else
+                {
+                    TabData tabData = new TabData(id, jointList, flags.JointFlags, true);
+                    _localSessions.Add(tabData);
+                }
+            }
+        }
+
+        #endregion
     }
 }

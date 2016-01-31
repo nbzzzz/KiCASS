@@ -49,9 +49,9 @@ namespace LaptopOrchestra.Kinect
             ConfigurationFlags = new Dictionary<JointType, bool>();
             KinectProcessor = new KinectProcessor();
 			SessionManager = new SessionManager();
-            BackgroundThread = new BackgroundThread();
+            //Create new state????
+            //BackgroundThread = new BackgroundThread(SessionManager, KinectProcessor);
 
-            //var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
             udpRec = new UDPReceiver(8080, SessionManager, KinectProcessor);
 
             // Initialize main GUI

@@ -28,7 +28,7 @@ namespace LaptopOrchestra.Kinect.Model
         List<TabData> _localSessions;
         
         //Used to fixed alignment issue between skeleton positional data and color image
-        private CoordinateMapper _coordinateMapper;
+        //private CoordinateMapper _coordinateMapper;
         
         //Copy of session manager to get open connections
         private SessionManager _sessionManager;
@@ -40,18 +40,21 @@ namespace LaptopOrchestra.Kinect.Model
 
         #region Contructor
 
-        public BackgroundThread()//SessionManager sessionManager, KinectProcessor kinectProcessor)
+        public BackgroundThread(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
-            //NEEDED??
-            //_localSessions = new List<TabData>();
-            //_tabList = new TabList();
+            ///*
+            _sessionManager = sessionManager;
 
-            /*
+            //NEEDED??
+            _localSessions = new List<TabData>();
+            _tabList = new TabList();
+
             // Start timer for flag updating thread
             _timer = new System.Timers.Timer(1000);
             _timer.Elapsed += _timer_Elapsed;
             _timer.Start();
-            */
+            //*/
+            
         }
 
         #endregion
@@ -74,7 +77,6 @@ namespace LaptopOrchestra.Kinect.Model
 
             foreach (SessionWorker sw in workers)
             {
-
                 // Get the port and IP of this session
                 string id = sw.Ip + ":" + sw.Port.ToString();
 
@@ -101,22 +103,19 @@ namespace LaptopOrchestra.Kinect.Model
                     _localSessions.Find(tab => tab.Header.Equals(id)).displayFlags = flags.JointFlags;
                     _localSessions.Find(tab => tab.Header.Equals(id)).Items = jointList;
                     _localSessions.Find(tab => tab.Header.Equals(id)).Active = true;
-                    //updateThisTab(_localSessions.Find(tab => tab.Header.Equals(id)));
                 }
                 else
                 {
                     TabData tabData = new TabData(id, jointList, flags.JointFlags, true);
                     _localSessions.Add(tabData);
-                    //updateTabs();
                 }
             }
-            //UpdateTextBox("sess_id", "asdf");
-            //updateTabs();
         }
 
+        /*
         private void updateTabs()
         {
-            /*
+            
             this.Dispatcher.Invoke((Action)(() =>
             {
                 // Maintain the current tab selection
@@ -142,8 +141,7 @@ namespace LaptopOrchestra.Kinect.Model
                 //tabControl.SelectedIndex = currentSelected;
             }));
             */
-        }
-        
-        #endregion
     }
+
+    #endregion
 }

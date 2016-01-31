@@ -43,6 +43,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
         #endregion
 
         #region Public Properties
+
         //Used to fixed alignment issue between skeleton positional data and color image
         private CoordinateMapper _coordinateMapper;
 
@@ -61,7 +62,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
                 if (_myFrame != value)
                 {
                     _myFrame = value;
-                    UpdateJointList();
+                    //UpdateJointList();
                     NotifyPropertyChanged("MyFrame");
                 }
             }
@@ -84,39 +85,16 @@ namespace LaptopOrchestra.Kinect.ViewModel
 
         public MainWindowViewModel(SessionManager sessionManager, KinectProcessor kinectProcessor)
         {
+            //Initialize the default window state
             CurrentState = State.CreateNewState();
-            //myState.SessionName = "adsf";
 
-            //Initial Window State
-            //current_camera_state_string = Properties.Resources.CameraStateShow;
-            //current_orientation_state_string = Properties.Resources.OrientStateMirror;
-            //textBlock1.Text = Properties.Resources.TrackStateLoading;
-            //scaleImage.ScaleX = 1;
-            //scaleCanvas.ScaleX = 1;
-            //toggle_image = true;
-
-            //AllStatusBarStates = new ObservableCollection<string>(allStates[0]);
-            //CurrentText = AllStatusBarStates[0];
-            //CurrentText = CurrentState.SessionName;
-            //CurrentColor = AllStatusBarStates[1];
-            //MyFrame = null;
-
-            //ShowAllTabs (BackgroundThread?)
-            //AllSessions = new ObservableCollection<string>(allSessions);
-            //AllJointLists = new ObservableCollection<string[]>(allJointLists);
-
-            //start it off on the first one.
-            //SelectedTab = allSessions[0];
-            //CurrentJointList = AllJointLists[0];
-
-            //In BackgroundThread
-                //UpdateJointList()
-                //CurrentState.UpdateState();
+            //Start BackgroundThread
+            //CurrentState.UpdateState();
 
             //UI Thread
-                _sessionManager = sessionManager;
-                _coordinateMapper = kinectProcessor.CoordinateMapper;
-                kinectProcessor.Reader.MultiSourceFrameArrived += UI_Thread;
+            _sessionManager = sessionManager;
+            _coordinateMapper = kinectProcessor.CoordinateMapper;
+            kinectProcessor.Reader.MultiSourceFrameArrived += UI_Thread;
         }
 
         #endregion
@@ -157,8 +135,8 @@ namespace LaptopOrchestra.Kinect.ViewModel
                 {
                     if (frame != null)
                     {
-                        CurrentState.StatusTitle = "STANDBY";
-                        CurrentState.StatusColor = "Yellow";
+                        //CurrentState.StatusTitle = "STANDBY";
+                        CurrentState.StatusColor = "Peru";
                         mainWin.XAMLImage.Source = frame.ToBitmap();
                         //MyFrame = frame.ToBitmap();
                     }
@@ -256,6 +234,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
         }
         private void ExitCommandLogic()
         {
+            //CurrentState.UpdateState();
             System.Windows.Application.Current.Shutdown();
         }
 
@@ -285,6 +264,8 @@ namespace LaptopOrchestra.Kinect.ViewModel
                 //camera_button.Style = Resources["MetroButton"] as Style;
             }
             CurrentState.CameraToggleFlag = !CurrentState.CameraToggleFlag;
+
+            //CurrentState.UpdateState();
         }
 
         private RelayCommand _flipCameraCommand;
