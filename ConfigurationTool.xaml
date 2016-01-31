@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:src ="clr-namespace:LaptopOrchestra.Kinect"
         
-        Title="Kinect Music Interpreter | UBC Laptop Orchestra" Height="1080" Width="2120" >
+        Title="KiCASS | UBC Laptop Orchestra" Height="1080" Width="2120" >
 
     <Window.Resources>
         <ObjectDataProvider x:Key="TabListResource" ObjectType="{x:Type src:TabList}" />
@@ -15,25 +15,29 @@
             <ItemsControl ItemsSource="{Binding Path=Items}" FontSize="14" Grid.Column="0"/>            
         </DataTemplate>
     </Window.Resources>
-    <DockPanel>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-            <TabControl x:Name="tabControl"
-                        ItemsSource="{Binding Source={StaticResource TabListResource}}"
-                        Grid.Column="0" 
-                        ItemTemplate="{StaticResource HeaderTemplate}"
-                        ContentTemplate="{StaticResource ContentTemplate}"
-					    TabStripPlacement="Top" 
-					    Margin="0,0,0,9.667" Width="169" />
+    
+    <Viewbox>
+        <DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                
+                <TabControl x:Name="tabControl"
+                            ItemsSource="{Binding Source={StaticResource TabListResource}}"
+                            Grid.Column="0" 
+                            ItemTemplate="{StaticResource HeaderTemplate}"
+                            ContentTemplate="{StaticResource ContentTemplate}"
+					        TabStripPlacement="Top" 
+					        Margin="0,0,0,9.667" Width="169" />
 
-        
 
-            <Image Name="XAMLImage" Grid.Column="1" Height="1080" Width="1920"/>
-            <Canvas Name="XAMLCanvas" Grid.Column="1" Height="1080" Width="1920"/>
-        </Grid>
-    </DockPanel>
+                <Image Name="XAMLImage" Grid.Column="1"/>
+                
+                <Canvas Name="XAMLCanvas" Grid.Column="1"/>
+            </Grid>
+        </DockPanel>
+    </Viewbox>
 
 </Window>

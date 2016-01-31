@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Input;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -8,12 +11,7 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         ///     Configuration Flags Object
         /// </summary>
-        private readonly Dictionary<JointType, bool> _configurationFlags;
-
-        /// <summary>
-        ///     OSC message builder
-        /// </summary>
-        private readonly OscBuilder _oscBuilder;
+        private readonly ConfigFlags _configurationFlags;
 
         /// <summary>
         ///     Bodies that will containt the data from the Kinect
@@ -23,10 +21,8 @@ namespace LaptopOrchestra.Kinect
 		private UDPSender _dataSender;
 
 
-        public DataSubscriber(Dictionary<JointType, bool> configurationFlags, KinectProcessor kinectProcessor, UDPSender dataSender)
+        public DataSubscriber(ConfigFlags configurationFlags, KinectProcessor kinectProcessor, UDPSender dataSender)
         {
-            _oscBuilder = new OscBuilder();
-
             _configurationFlags = configurationFlags;
 
 			_dataSender = dataSender;
@@ -54,11 +50,25 @@ namespace LaptopOrchestra.Kinect
 
                     foreach (var joint in body.Joints)
                     {
-                        if (!_configurationFlags[joint.Key]) continue;
+                        if (!_configurationFlags.JointFlags[joint.Key]) continue;
 
-                        var jointMessage = _oscBuilder.BuildJointMessage(joint.Value);
+                        var jointMessage = OscSerializer.BuildJointMessage(joint.Value);
                         _dataSender.SendMessage(jointMessage);
                     }
+
+
+                    if (_configurationFlags.HandStateFlag[HandType.LEFT])
+                    {
+                        var handMessage = OscSerializer.BuildLeftHandStateMessage(body.HandLeftState);
+                        _dataSender.SendMessage(handMessage);
+                    }
+                    if (_configurationFlags.HandStateFlag[HandType.RIGHT])
+                    {
+                        var handMessage = OscSerializer.BuildRightHandStateMessage(body.HandLeftState);
+                        _dataSender.SendMessage(handMessage);
+                    }
+
+					return;
                 }
             }
         }

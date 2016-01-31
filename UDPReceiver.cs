@@ -36,26 +36,47 @@ namespace LaptopOrchestra.Kinect
 					// this will block until one arrives or the socket is closed
 					OscPacket packet = _receiver.Receive();
 
-					// parse the message
-					string[] msg = packet.ToString().Split(new string[] { ", " }, StringSplitOptions.None);
-					//skip the first index of the parsed address as it is an empty string (remove if refactored to not start osc message with leading /)
-					string[] msgAddress = msg[0].Split(new char[] { '/' }).Skip(1).ToArray();
+				    Logger.Debug("Recieved packet " + packet);
 
-					var ip = msg[1].Replace("\"", "");
-					var port = int.Parse(msg[2]);
-						
+                    if (!OscDeserializer.IsValid(packet)) continue;
+
+					// parse the message
+					string[] msg = OscDeserializer.ParseOscPacket(packet);
+					string[] msgAddress = OscDeserializer.GetMessageAddress(msg);
+
+					var ip = OscDeserializer.GetMessageIp(msg);
+					var port = OscDeserializer.GetMessagePort(msg);
+
+
 					// if the sessionWorker already exists, update config. Otherwise, create a new sessionWorker
-					SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
+					SessionWorker session = CheckSession(ip, port);
 
 					if (session == null)
 					{
+                        Logger.Info("New session created with " + ip + ":" + port);
 						session = new SessionWorker(ip, port, _dataPub, _sessionManager);
 						_sessionManager.AddConnection(session);
-						session.SetTimers(msgAddress);
+						session.SetTimers();
 					}
-					session.SetLookupFlags(msgAddress);
+
+				    if (msgAddress[1] == "joint")
+				    {
+				        var binSeq = OscDeserializer.GetMessageBinSeq(msg);
+                        session.SetJointFlags(binSeq);
+                    }
+				    else if (msgAddress[1] == "handstate")
+				    {
+                        var handStateFlag = OscDeserializer.GetMessageHandStateFlag(msg);
+                        session.SetHandFlag(handStateFlag);
+                    }
 				}
 			}
+		}
+
+		private SessionWorker CheckSession(string ip, int port)
+		{
+			SessionWorker session = _sessionManager.OpenConnections.FirstOrDefault(x => x.Ip == ip && x.Port == port);
+			return session;
 		}
 
 		public void Close()

@@ -10,10 +10,9 @@ namespace LaptopOrchestraTest
         [Test]
         public void BuildJointMessageTest()
         {
-            OscBuilder oscBuilder = new OscBuilder();
             Joint joint = new Joint();
             joint.JointType = JointType.HandLeft;
-            var msg = oscBuilder.BuildJointMessage(joint);
+            var msg = OscSerializer.BuildJointMessage(joint);
 
             Assert.AreEqual("/kinect/joint/HandLeft", msg.Address);
         }

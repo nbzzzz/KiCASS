@@ -9,7 +9,11 @@ namespace LaptopOrchestra.Kinect
 
 		public List<SessionWorker> OpenConnections
 		{
-			get { return _openConnections; }
+			get
+			{
+				CleanConnections();
+				return _openConnections;
+			}
 		}
 
 		public SessionManager()
@@ -24,16 +28,25 @@ namespace LaptopOrchestra.Kinect
 
 		public void CloseAllConnections()
 		{
-			foreach (var session in _openConnections)
+            Logger.Info("Closing all sessions");
+            foreach (var session in _openConnections)
 			{
-				session.CloseSession();
+				session.EndSession = true;
 			}
 			_openConnections.Clear();
 		}
 
-		public void RemoveConnection(SessionWorker session)
+		private void CleanConnections()
 		{
-			_openConnections.Remove(session);
+			for (int i = _openConnections.Count-1; i >= 0; i--)
+			{
+				if (_openConnections[i].EndSession)
+				{
+				    var session = _openConnections[i];
+                    Logger.Info("Removing " + session.Ip + ":" + session.Port + " from session manager");
+					_openConnections.RemoveAt(i);
+				}
+			}
 		}
 	}
 }
