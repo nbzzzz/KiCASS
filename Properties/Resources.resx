@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FailedScreenshotStatusTextFormat" xml:space="preserve">
-    <value>Failed to write screenshot to {0}</value>
-  </data>
   <data name="NoSensorStatusText" xml:space="preserve">
     <value>No ready Kinect found!</value>
   </data>
@@ -128,5 +125,30 @@
   </data>
   <data name="SensorNotAvailableStatusText" xml:space="preserve">
     <value>Kinect not available!</value>
+  </data>
+  <data name="MainWindowViewModel_DisplayName" xml:space="preserve">
+    <value>KiCASS-desktop</value>
+    <comment>Title of the main window</comment>
+  </data>
+  <data name="CameraStateHide" xml:space="preserve">
+    <value>Camera: HIDE</value>
+  </data>
+  <data name="CameraStateShow" xml:space="preserve">
+    <value>Camera: SHOW</value>
+  </data>
+  <data name="OrientStateMirror" xml:space="preserve">
+    <value>Orientation: MIRRORED</value>
+  </data>
+  <data name="OrientStateTrue" xml:space="preserve">
+    <value>Orientation: TRUE</value>
+  </data>
+  <data name="TrackStateActive" xml:space="preserve">
+    <value>TRACKING</value>
+  </data>
+  <data name="TrackStateLoading" xml:space="preserve">
+    <value>LOADING</value>
+  </data>
+  <data name="TrackStateStandby" xml:space="preserve">
+    <value>STANDBY</value>
   </data>
 </root>

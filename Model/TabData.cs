@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace LaptopOrchestra.Kinect
 {
     public class TabData
     {
+        #region properties
+
         private string _header;
         private int _height;
         private int _width;
@@ -19,6 +22,11 @@ namespace LaptopOrchestra.Kinect
         private Dictionary<JointType, bool> _displayFlags;
         private bool _active;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region Constructor
 
         public TabData(string header, int height, int width, int itemListWidth, List<String> items, Dictionary<JointType, bool> displayFlags)
         {
@@ -42,6 +50,10 @@ namespace LaptopOrchestra.Kinect
             _active = active;
         }
 
+        #endregion
+
+        #region functions
+
         public string Header
         {
             get { return _header; }
@@ -57,8 +69,7 @@ namespace LaptopOrchestra.Kinect
             get { return _displayFlags; }
             set { _displayFlags = value; }
         }
-
-
+        
         public int Height
         {
             get
@@ -95,6 +106,8 @@ namespace LaptopOrchestra.Kinect
                 _active = value;
             }
         }
+
+        #endregion
     }
 
     public class TabList : ObservableCollection<TabData>

@@ -61,11 +61,29 @@ namespace LaptopOrchestra.Kinect.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to write screenshot to {0}.
+        ///   Looks up a localized string similar to Camera: HIDE.
         /// </summary>
-        internal static string FailedScreenshotStatusTextFormat {
+        internal static string CameraStateHide {
             get {
-                return ResourceManager.GetString("FailedScreenshotStatusTextFormat", resourceCulture);
+                return ResourceManager.GetString("CameraStateHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Camera: SHOW.
+        /// </summary>
+        internal static string CameraStateShow {
+            get {
+                return ResourceManager.GetString("CameraStateShow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to KiCASS-desktop.
+        /// </summary>
+        internal static string MainWindowViewModel_DisplayName {
+            get {
+                return ResourceManager.GetString("MainWindowViewModel_DisplayName", resourceCulture);
             }
         }
         
@@ -75,6 +93,24 @@ namespace LaptopOrchestra.Kinect.Properties {
         internal static string NoSensorStatusText {
             get {
                 return ResourceManager.GetString("NoSensorStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orientation: MIRRORED.
+        /// </summary>
+        internal static string OrientStateMirror {
+            get {
+                return ResourceManager.GetString("OrientStateMirror", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orientation: TRUE.
+        /// </summary>
+        internal static string OrientStateTrue {
+            get {
+                return ResourceManager.GetString("OrientStateTrue", resourceCulture);
             }
         }
         
@@ -93,6 +129,33 @@ namespace LaptopOrchestra.Kinect.Properties {
         internal static string SensorNotAvailableStatusText {
             get {
                 return ResourceManager.GetString("SensorNotAvailableStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TRACKING.
+        /// </summary>
+        internal static string TrackStateActive {
+            get {
+                return ResourceManager.GetString("TrackStateActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LOADING.
+        /// </summary>
+        internal static string TrackStateLoading {
+            get {
+                return ResourceManager.GetString("TrackStateLoading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to STANDBY.
+        /// </summary>
+        internal static string TrackStateStandby {
+            get {
+                return ResourceManager.GetString("TrackStateStandby", resourceCulture);
             }
         }
     }

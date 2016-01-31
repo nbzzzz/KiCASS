@@ -1,14 +1,9 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="App.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
 using log4net.Config;
 using Microsoft.Kinect;
+using LaptopOrchestra.Kinect.ViewModel;
+using LaptopOrchestra.Kinect.Model;
 
 [assembly: XmlConfigurator(Watch = true)]
 
@@ -34,6 +29,10 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         public SessionManager SessionManager;
 
+        public BackgroundThread BackgroundThread;
+
+        public UDPReceiver udpRec;
+
         /// <summary>
         ///     Execute start up tasks
         /// </summary>
@@ -48,20 +47,18 @@ namespace LaptopOrchestra.Kinect
             Logger.Debug("App Startup");
 
             ConfigurationFlags = new Dictionary<JointType, bool>();
-
             KinectProcessor = new KinectProcessor();
-
 			SessionManager = new SessionManager();
+            BackgroundThread = new BackgroundThread();
 
-			var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
+            //var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
+            udpRec = new UDPReceiver(8080, SessionManager, KinectProcessor);
 
             // Initialize main GUI
-            var configurationTool = new ConfigurationTool(SessionManager, KinectProcessor)
-            {
-                Top = 0,
-                Left = 0
-            };
-            configurationTool.Show();
+            MainWindow window = new MainWindow();
+            var viewModel = new MainWindowViewModel(SessionManager, KinectProcessor);
+            window.DataContext = viewModel;
+            MainWindow.Show();
         }
 
         private void App_Exit(object sender, ExitEventArgs e)
@@ -71,6 +68,7 @@ namespace LaptopOrchestra.Kinect
             Logger.Info("Shut down Kinect");
             KinectProcessor.StopKinect();
             Logger.Info("KiCASS Exited Succesfully");
+            udpRec.Close();
         }
     }
 }

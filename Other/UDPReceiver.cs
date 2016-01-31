@@ -81,9 +81,11 @@ namespace LaptopOrchestra.Kinect
 
 		public void Close()
 		{
-			_receiver.Close();
+            
+            _receiver.Close();
+            _receiver.Dispose();
 
-			_listenerThread.Join();
+            _listenerThread.Join();
 		}
 	}
 }
