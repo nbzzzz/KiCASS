@@ -38,7 +38,7 @@ namespace LaptopOrchestra.Kinect
 
 				    Logger.Debug("Recieved packet " + packet);
 
-                    if (!OscDeserializer.IsValid(packet)) continue;
+                    if (!OscDeserializer.IsValid(packet.ToString())) continue;
 
 					// parse the message
 					string[] msg = OscDeserializer.ParseOscPacket(packet);
