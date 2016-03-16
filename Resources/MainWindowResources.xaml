@@ -14,7 +14,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <Border 
-            Background="{StaticResource Brush_HeaderBackground}" 
+            Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" 
             BorderBrush="LightGray" 
             BorderThickness="1" 
             CornerRadius="0" 

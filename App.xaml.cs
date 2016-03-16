@@ -1,74 +1,41 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using log4net.Config;
-using Microsoft.Kinect;
 using LaptopOrchestra.Kinect.ViewModel;
-using LaptopOrchestra.Kinect.Model;
-
-[assembly: XmlConfigurator(Watch = true)]
+using System;
 
 namespace LaptopOrchestra.Kinect
 {
-    /// <summary>
-    ///     Interaction logic for App
-    /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        ///     Configuration Items selected
-        /// </summary>
-        public Dictionary<JointType, bool> ConfigurationFlags;
-
-        /// <summary>
-        ///      Kinect 2.0 object that publishes new data
-        /// </summary>
-        public KinectProcessor KinectProcessor;
-
-        /// <summary>
-        ///     Manages the active connections to KiCASS
-        /// </summary>
-        public SessionManager SessionManager;
-
-        public BackgroundThread BackgroundThread;
-
-        public UDPReceiver udpRec;
-
-        /// <summary>
-        ///     Execute start up tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void App_Startup(object sender, StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
-            ShutdownMode = ShutdownMode.OnLastWindowClose;
+            base.OnStartup(e);
 
             // Initialize logger
             XmlConfigurator.Configure();
             Logger.Debug("App Startup");
-
-            ConfigurationFlags = new Dictionary<JointType, bool>();
-            KinectProcessor = new KinectProcessor();
-			SessionManager = new SessionManager();
-            //Create new state????
-            //BackgroundThread = new BackgroundThread(SessionManager, KinectProcessor);
-
-            udpRec = new UDPReceiver(8080, SessionManager, KinectProcessor);
-
-            // Initialize main GUI
+            
+            //Create the main window view.
             MainWindow window = new MainWindow();
-            var viewModel = new MainWindowViewModel(SessionManager, KinectProcessor);
-            window.DataContext = viewModel;
-            MainWindow.Show();
-        }
 
-        private void App_Exit(object sender, ExitEventArgs e)
-        {
-            Logger.Info("Closing Connections");
-            SessionManager.CloseAllConnections();
-            Logger.Info("Shut down Kinect");
-            KinectProcessor.StopKinect();
-            Logger.Info("KiCASS Exited Succesfully");
-            udpRec.Close();
+            // Create the ViewModel to which the main window binds.
+            MainWindowViewModel viewModel = new MainWindowViewModel();
+
+            // When the ViewModel asks to be closed,  close the window.
+            EventHandler handler = null;
+            handler = delegate
+            {
+                viewModel.RequestClose -= handler;
+                window.Close();
+            };
+            viewModel.RequestClose += handler;
+
+            // Allow all controls in the window to bind to the ViewModel by
+            //setting the DataContext, which propagates down the element tree.
+            window.DataContext = viewModel;
+
+            //Show the main window.
+            window.Show();
         }
     }
 }

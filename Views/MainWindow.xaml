@@ -1,0 +1,251 @@
+﻿<Window
+    x:Class="LaptopOrchestra.Kinect.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:src ="clr-namespace:LaptopOrchestra.Kinect"
+        
+    Title="KiCASS-desktop | UBC Laptop Orchestra"
+    FontSize="13" FontFamily="Verdana"
+    WindowState="Maximized" HorizontalAlignment="Center"
+    WindowStartupLocation="CenterScreen"
+    Width="1200" Height="600"
+    MinWidth="900" MinHeight="450" Background="#FF717EB8"
+    >
+
+    <Window.Resources>
+        <ResourceDictionary Source="../Resources/MainWindowResources.xaml" />
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu
+            DockPanel.Dock="Top"
+            KeyboardNavigation.TabNavigation="Cycle" Background="White">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem Header="T_oggle Orientation" Command="{Binding FlipCameraCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Visit README page on Github" Command="{Binding OpenGitHubCommand}" />
+                <MenuItem Header="A_bout" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Grid
+            DockPanel.Dock="Left"
+            Margin="4,4,0,4"
+            Width="250">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="90" />
+            </Grid.RowDefinitions>
+
+            <Border 
+                Grid.Row="0" 
+                Style="{StaticResource MainBorderStyle}">
+                <ListBox
+                    x:Name="TabListDisplay"
+                    Grid.Row="0"
+                    ItemsSource="{Binding MyTabWindowViewModel.FirstList}"
+                    SelectedItem="{Binding MyTabWindowViewModel.SelectedTab, Mode=TwoWay}"
+                    FontSize="16"/>
+            </Border>
+
+            <Border 
+                Grid.Row="2" 
+                Style="{StaticResource MainBorderStyle}">
+                <ListBox
+                    ItemsSource="{Binding MyTabWindowViewModel.SecondList}"
+                    FontSize="16"/>
+            </Border>
+
+            <Border 
+                Grid.Row="4"
+                Style="{StaticResource MainBorderStyle}">
+                <Button
+                     x:Name="orientation_button"
+                    Command="{Binding FlipCameraCommand}">
+                    <Image>
+                        <Image.Source>
+                            <Binding Path="CurrentState.Status"/>
+                        </Image.Source>
+                    </Image>
+                </Button>
+
+            </Border>
+
+        </Grid>
+
+        <Grid
+            Margin="4,4,4,4"
+            Background="#FFDDDFF3">
+            <Image Source="/Assets/Logo.png" />
+
+            <Image
+                Name="XAMLImage"
+                RenderTransformOrigin="0.5,0.5" >
+                <Image.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform
+                                x:Name="scaleImage"
+                                ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                    </TransformGroup>
+                </Image.RenderTransform>
+            </Image>
+
+            <ContentPresenter
+                Content="{Binding MyCanvas}"
+                ClipToBounds="true"
+                RenderTransformOrigin="0.5,0.5" >
+                <ContentPresenter.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform
+                                x:Name="scaleCanvas"
+                                ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                    </TransformGroup>
+                </ContentPresenter.RenderTransform>
+            </ContentPresenter>
+        </Grid>
+
+    </DockPanel>
+</Window>
+
+
+
+<!--
+    //For orientation button
+    Style="{StaticResource MainBorderStyle}"
+    
+    BorderBrush="White" Background="#FFDDDFF3"
+    
+    Content="{Binding CurrentState.OrientationButtonText}"
+    
+    
+     <Grid
+            Margin="4,4,4,4"
+            Background="{Binding CurrentState.StatusColor}">
+
+    <Border 
+                Style="{StaticResource MainBorderStyle2}"
+                Background="#FFDDDFF3"
+                Margin="20,20,20,20"
+                Grid.Row="0">
+            </Border>
+
+    
+    GOOD CANVAS
+    <ContentPresenter
+                Content="{Binding MyCanvas}"
+                ClipToBounds="true"
+                RenderTransformOrigin="0.5,0.5" >
+                     <ContentPresenter.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform
+                                x:Name="scaleCanvas"
+                                ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                        </TransformGroup>
+                    </ContentPresenter.RenderTransform>
+            </ContentPresenter>
+
+    
+    
+            <ContentPresenter
+                Content="{Binding MyFrame}"
+                ClipToBounds="true"
+                RenderTransformOrigin="0.5,0.5" >
+                <ContentPresenter.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform
+                                x:Name="scaleImage"
+                                ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                    </TransformGroup>
+                </ContentPresenter.RenderTransform>
+            </ContentPresenter>
+    
+       <Image Source="/Resources/splashLogo2.png"/>
+            
+            <Image 
+                Source="{Binding MyFrame}"
+                RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                    <ScaleTransform
+                            x:Name="scaleImage"
+                            ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                </Image.RenderTransform>
+            </Image>
+
+    <Border
+                Grid.Row="0"
+                RenderTransformOrigin="0.5,0.5">
+                
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform
+                            x:Name="scaleCanvas"
+                            ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                    </TransformGroup>
+                </Border.RenderTransform>
+                    
+                <ContentPresenter
+                    Content="{Binding MyCanvas}"
+                    Focusable="true"
+                    ClipToBounds="true"
+                    Margin="0" >
+                </ContentPresenter>
+                
+            </Border>
+    
+    <Border 
+        Grid.Row="0" 
+        Style="{StaticResource MainBorderStyle2}" Background="#FFDDDFF3">
+        <Image 
+            Name="XAMLImage"
+            Source="{Binding MyImage}"
+            RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <ScaleTransform
+                    x:Name="scaleImage"
+                    ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+            </Image.RenderTransform>
+        </Image>
+    </Border>
+    
+    
+    <Border
+        Grid.Row="0"
+        RenderTransformOrigin="0.5,0.5" >
+        <Border.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform
+                    x:Name="scaleCanvas"
+                    ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+            </TransformGroup>
+        </Border.RenderTransform>
+        <Canvas
+            Name="XAMLCanvas">
+        </Canvas>
+    </Border>
+    
+    
+    <TabControl x:Name="tabControl"
+                        ItemsSource="{Binding Source={StaticResource TabListResource}}"
+                        ItemTemplate="{StaticResource HeaderTemplate}"
+                        ContentTemplate="{StaticResource ContentTemplate}"
+                        TabStripPlacement="Left"
+                        Background="#FFE9E2FF"/>-->
+
+<!--<Window.Resources>
+        <ObjectDataProvider x:Key="TabListResource" ObjectType="{x:Type src:TabList}" />
+        <DataTemplate x:Key="HeaderTemplate">
+            <TextBlock Text="{Binding Path=Header}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ContentTemplate">
+            <ItemsControl ItemsSource="{Binding Path=Items}" FontSize="14" Grid.Column="0"/>
+        </DataTemplate>
+    </Window.Resources>-->

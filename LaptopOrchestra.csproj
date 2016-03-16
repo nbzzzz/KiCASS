@@ -136,16 +136,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Model\State.cs" />
-    <Compile Include="Model\Tab.cs" />
+    <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Other\BitmapHelper.cs" />
-    <Compile Include="Model\BackgroundThread.cs" />
+    <Compile Include="ViewModels\TabWindowViewModel.cs" />
     <Compile Include="Other\ConfigFlags.cs" />
     <Compile Include="Other\Constants.cs" />
     <Compile Include="Other\OscDeserializer.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="Model\TabData.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Other\RelayCommand.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Other\DataSubscriber.cs" />
@@ -156,9 +154,9 @@
     <Compile Include="Other\SessionManager.cs" />
     <Compile Include="Other\UDPReceiver.cs" />
     <Compile Include="Other\UDPSender.cs" />
-    <Compile Include="ViewModel\MainWindowViewModel.cs" />
-    <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,7 +164,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MainWindowResources.xaml">
+    <Page Include="Resources\MainWindowResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -212,9 +210,26 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataAccess\" />
+    <Resource Include="Assets\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\sensor-tracking.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\sensor-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\sensor-on.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\sensor-on-flip.jpg" />
+    <Resource Include="Assets\sensor-tracking-flip.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
