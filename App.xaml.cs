@@ -14,7 +14,7 @@ namespace LaptopOrchestra.Kinect
             // Initialize logger
             XmlConfigurator.Configure();
             Logger.Debug("App Startup");
-            
+
             //Create the main window view.
             MainWindow window = new MainWindow();
 
