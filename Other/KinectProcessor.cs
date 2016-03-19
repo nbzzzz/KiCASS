@@ -8,14 +8,17 @@ namespace LaptopOrchestra.Kinect
 
         public KinectProcessor()
         {
-			_sensor = KinectSensor.GetDefault();
+            Sensor = KinectSensor.GetDefault();
 
-			if (_sensor == null) return;
+			if (Sensor == null) return;
 
-			_sensor.Open();
+            Sensor.Open();
 
-			Reader = _sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-			CoordinateMapper = _sensor.CoordinateMapper;
+			Reader = Sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+
+			CoordinateMapper = Sensor.CoordinateMapper;
+
+            //IsAvailable2 = Sensor.IsAvailable;
 		}
 
         #endregion
@@ -27,6 +30,8 @@ namespace LaptopOrchestra.Kinect
         /// </summary>
         public MultiSourceFrameReader Reader;
 
+        public bool IsAvailable2;
+
         /// <summary>
         ///      Used to fixed alignment issue between skeleton positional data and color image
         /// </summary>
@@ -35,7 +40,7 @@ namespace LaptopOrchestra.Kinect
         /// <summary>
         ///     Microsoft Kinect 2.0 sensor
         /// </summary>
-        private KinectSensor _sensor;
+        public KinectSensor Sensor;
 
         #endregion
 
@@ -45,7 +50,7 @@ namespace LaptopOrchestra.Kinect
         {
             Reader?.Dispose();
 
-            _sensor?.Close();
+            Sensor?.Close();
         }
 
         #endregion
