@@ -201,10 +201,11 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\sensor-off.jpg" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Logo.png" />
-    <Resource Include="Assets\sensor-off.png" />
     <Resource Include="Assets\sensor-on-flip.jpg" />
     <Resource Include="Assets\sensor-on.jpg" />
     <Resource Include="Assets\sensor-tracking-flip.jpg" />

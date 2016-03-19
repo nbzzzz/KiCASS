@@ -97,7 +97,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
         #endregion
 
 
-        public static string[] a = {"/Assets/sensor-off.png",
+        public static string[] a = {"/Assets/sensor-off.jpg",
                                     "/Assets/sensor-on.jpg",
                                     "/Assets/sensor-on-flip.jpg",
                                     "/Assets/sensor-tracking.jpg",

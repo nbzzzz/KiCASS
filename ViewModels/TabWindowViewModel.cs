@@ -46,6 +46,35 @@ namespace LaptopOrchestra.Kinect.Model
             }
         }
 
+        private ObservableCollection<string> _firstList;
+        public ObservableCollection<string> FirstList
+        {
+            get { return _firstList; }
+            set
+            {
+                if (value != _firstList)
+                {
+                    _firstList = value;
+                    OnPropertyChanged("FirstList");
+                }
+            }
+        }
+
+        private string[] _firstArray;
+        public string[] FirstArray
+        {
+            get { return _firstArray; }
+            set
+            {
+                if (value != _firstArray)
+                {
+                    _firstArray = value;
+                    //UpdateFirstList();
+                    OnPropertyChanged("FirstArray");
+                }
+            }
+        }
+
         private ObservableCollection<string> _secondList;
         public ObservableCollection<string> SecondList
         {
@@ -60,20 +89,6 @@ namespace LaptopOrchestra.Kinect.Model
             }
         }
 
-        private ObservableCollection<string> _firstList;
-        public ObservableCollection<string> FirstList
-        {
-            get { return _firstList; }
-            set
-            {
-                if (value != _firstList)
-                {
-                    _firstList = value;
-                    OnPropertyChanged("FirstList");
-                }
-            }
-        }
-        
         private string[,] _allJoints;
         public string[,] AllJoints
         {
@@ -111,21 +126,24 @@ namespace LaptopOrchestra.Kinect.Model
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             //Debug.WriteLine("\nBackground thread hit");
-            UpdateFirstList();
+            UpdateFirstArray();
             UpdateSecondList(SelectedTab);
         }
 
-        private void UpdateFirstList()
+        private void UpdateFirstArray()
         {
             Debug.WriteLine("\nAddTabs");
 
             NumSessions = 0;
-            FirstList = new ObservableCollection<string>();
+            //FirstList = new ObservableCollection<string>();
+
             AllJoints = new string[20, 25]; 
             SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
             _sessionManager.OpenConnections.CopyTo(workers);
             var jointTypes = Enum.GetValues(typeof(JointType));
-            string[] TempArray1 = new string[20];
+
+            //string[] TempArray1 = new string[20];
+            FirstArray = new string[20];
 
             foreach (SessionWorker sw in workers)
             {
@@ -136,7 +154,7 @@ namespace LaptopOrchestra.Kinect.Model
                 ConfigFlags flags = sw.ConfigFlags;
 
                 //Add session name to session array
-                TempArray1[NumSessions] = id;
+                FirstArray[NumSessions] = id;
 
                 //get joint list for current session
                 List<string> MyJointList = new List<string>();
@@ -146,6 +164,8 @@ namespace LaptopOrchestra.Kinect.Model
                         MyJointList.Add(jt.ToString());
                     }
                 }
+                //update FirstList (GUI)
+                //moved
 
                 //get joint array
                 string[] MyJointArray = MyJointList.ToArray();
@@ -161,12 +181,39 @@ namespace LaptopOrchestra.Kinect.Model
                 NumSessions++;
             }
 
+            //update First GUI Box
+            UpdateFirstList();
+        }
+
+        private void UpdateFirstList()
+        {
             //update FirstList (GUI)
-            var TempList = new ObservableCollection<string>(TempArray1);
+            bool x = true;
+            int y = 0;
+            int z = 0;
+            var TempList = new ObservableCollection<string>(FirstArray);
+            //SelectedTab = null;
+
+            //Find Tab to show
+            for (y = 0; y < 20; y++)
+            {
+                if (SelectedTab == null)
+                {
+                    z = 0;
+                }
+                else if (SelectedTab == FirstArray[y] && x == true)
+                {
+                    z = y;
+                    x = false;
+                }
+                //break;
+            }
+
             DispatchService.Invoke(() =>
             {
                 //this.FirstList = new ObservableCollection<string>(TempArray1);
                 this.FirstList = TempList;
+                this.SelectedTab = this.FirstArray[z];
             });
         }
 
@@ -182,6 +229,9 @@ namespace LaptopOrchestra.Kinect.Model
                 int index = 0;
                 for (index = 0; index < NumSessions; index++)
                 {
+                    Debug.WriteLine("\n index: " + index + ", NumSess = " + NumSessions);
+                    Debug.WriteLine("\n id: "+ id);
+                    Debug.WriteLine("\n : FirstList[index]" + FirstList[index]);
                     if (FirstList[index] == id) break;
                 }
                 
