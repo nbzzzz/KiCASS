@@ -250,6 +250,21 @@ namespace LaptopOrchestra.Kinect.Model
                 });
             }
         }
+
+        public void Close()
+        {
+            Debug.WriteLine("\n TabViewModel.Close1");
+            DispatchService.Stop();
+
+            Debug.WriteLine("\n TabViewModel.Close2");
+            _timer.Stop();
+
+            Debug.WriteLine("\n TabViewModel.Close3");
+            _timer.Close();
+            
+
+            //System.Windows.Application.Current.Shutdown();
+        }
         #endregion
 
         #region INotifyPropertyChanged implementation
@@ -279,4 +294,11 @@ public static class DispatchService
             dispatchObject.Invoke(action);
         }
     }
+
+    public static void Stop()
+    {
+        Dispatcher dispatchObject = Application.Current.Dispatcher;
+        dispatchObject.InvokeShutdown();
+    }
+
 }

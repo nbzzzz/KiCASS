@@ -119,7 +119,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
             SetState(0);
 
             //Start the background thread for updating tabs.
-            //MyTabWindowViewModel = new TabWindowViewModel(_sessionManager);
+            MyTabWindowViewModel = new TabWindowViewModel(_sessionManager);
 
             //Start the UI thread for updating the UI. //Debug.WriteLine("\n starting UI thread \n");
             _kinectProcessor.Reader.MultiSourceFrameArrived += UI_Thread;
@@ -235,11 +235,21 @@ namespace LaptopOrchestra.Kinect.ViewModel
             }
         }
 
-        private void Close()
+        public void Close()
         {
+            Debug.WriteLine("\n MainWindowViewModel.Close1");
+            MyTabWindowViewModel.Close();
+
+            Debug.WriteLine("\n MainWindowViewModel.Close2");
+            _kinectProcessor.StopKinect();
+
+            Debug.WriteLine("\n MainWindowViewModel.Close3");
             _sessionManager.CloseAllConnections();
+
+            Debug.WriteLine("\n MainWindowViewModel.Close4");
             _udpRec.Close();
-            System.Windows.Application.Current.Shutdown();
+
+            //System.Windows.Application.Current.Shutdown();
         }
         #endregion
 
