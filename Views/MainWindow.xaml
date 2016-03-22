@@ -18,8 +18,9 @@
 
     <DockPanel>
         <Menu
-            DockPanel.Dock="Top"
-            KeyboardNavigation.TabNavigation="Cycle" Background="White">
+                DockPanel.Dock="Top"
+                KeyboardNavigation.TabNavigation="Cycle"
+                Background="White">
             <MenuItem Header="_File">
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
@@ -33,9 +34,9 @@
         </Menu>
 
         <Grid
-            DockPanel.Dock="Left"
-            Margin="4,4,0,4"
-            Width="250">
+                DockPanel.Dock="Left"
+                Margin="4,4,0,4"
+                Width="250">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -46,30 +47,30 @@
             </Grid.RowDefinitions>
 
             <Border 
-                Grid.Row="0" 
-                Style="{StaticResource MainBorderStyle}">
+                    Grid.Row="0" 
+                    Style="{StaticResource MainBorderStyle}">
                 <ListBox
-                    x:Name="TabListDisplay"
-                    Grid.Row="0"
-                    ItemsSource="{Binding MyTabWindowViewModel.FirstList}"
-                    SelectedItem="{Binding MyTabWindowViewModel.SelectedTab, Mode=TwoWay}"
-                    FontSize="16"/>
+                        x:Name="TabListDisplay"
+                        Grid.Row="0"
+                        ItemsSource="{Binding MyTabWindowViewModel.FirstList}"
+                        SelectedItem="{Binding MyTabWindowViewModel.SelectedTab, Mode=TwoWay}"
+                        FontSize="16"/>
             </Border>
 
             <Border 
-                Grid.Row="2" 
-                Style="{StaticResource MainBorderStyle}">
+                    Grid.Row="2" 
+                    Style="{StaticResource MainBorderStyle}">
                 <ListBox
-                    ItemsSource="{Binding MyTabWindowViewModel.SecondList}"
-                    FontSize="16"/>
+                        ItemsSource="{Binding MyTabWindowViewModel.SecondList}"
+                        FontSize="16"/>
             </Border>
 
             <Border 
-                Grid.Row="4"
-                Style="{StaticResource MainBorderStyle}">
+                    Grid.Row="4"
+                    Style="{StaticResource MainBorderStyle}">
                 <Button
-                     x:Name="orientation_button"
-                    Command="{Binding FlipCameraCommand}">
+                         x:Name="orientation_button"
+                        Command="{Binding FlipCameraCommand}">
                     <Image>
                         <Image.Source>
                             <Binding Path="CurrentState.Status"/>
@@ -80,11 +81,37 @@
             </Border>
 
         </Grid>
+        <Border Background="#FFDDDFF3"
+                 Margin="4,4,4,4">
 
-        <Grid
-            Margin="4,4,4,4"
-            Background="#FFDDDFF3">
-            <Image Source="/Assets/Logo.png" />
+            <Viewbox>
+                <DockPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Canvas Name="XAMLCanvas2" Grid.Column="0"
+                            Width="auto"
+                            Height="auto"
+                            ClipToBounds="False"
+                            Background="AliceBlue"/>
+                        <Image Name="XAMLImage" Grid.Column="0"/>
+                        <Canvas Name="XAMLCanvas" Grid.Column="0"
+                            Width="{Binding ActualWidth, ElementName=XAMLImage}"
+                            Height="{Binding ActualHeight, ElementName=XAMLImage}"
+                            ClipToBounds="True"/>
+                    </Grid>
+                </DockPanel>
+            </Viewbox>
+        </Border>
+    </DockPanel>
+</Window>
+
+
+
+<!--
+    
+    <Image Source="/Assets/Logo.png" />
 
             <Image
                 Name="XAMLImage"
@@ -97,11 +124,25 @@
                     </TransformGroup>
                 </Image.RenderTransform>
             </Image>
-
+    
+    <Viewbox
+                Stretch="Fill">
+            
+    
+    HorizontalAlignment="Right"
+    VerticalAlignment="Top"
+    Margin="20,20,20,20"
+    
+    
             <ContentPresenter
                 Content="{Binding MyCanvas}"
                 ClipToBounds="true"
+                Width="{Binding ActualWidth, ElementName=XAMLImage}"
+                Height="{Binding ActualHeight, ElementName=XAMLImage}"
                 RenderTransformOrigin="0.5,0.5" >
+                
+            </ContentPresenter>
+    
                 <ContentPresenter.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform
@@ -109,15 +150,12 @@
                                 ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
                     </TransformGroup>
                 </ContentPresenter.RenderTransform>
-            </ContentPresenter>
-        </Grid>
 
-    </DockPanel>
-</Window>
-
-
-
-<!--
+    ClipToBounds="true"
+    
+    Width="{Binding ActualWidth, ElementName=XAMLImage}"
+                Height="{Binding ActualHeight, ElementName=XAMLImage}"
+    
     //For orientation button
     Style="{StaticResource MainBorderStyle}"
     

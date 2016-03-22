@@ -160,7 +160,8 @@ namespace LaptopOrchestra.Kinect.ViewModel
             {
                 using (bodyFrame)
                 {
-                    MyCanvas.Children.Clear();
+                    //MyCanvas.Children.Clear();
+                    mainWin.XAMLCanvas.Children.Clear();
                     _bodies = new Body[bodyFrame.BodyFrameSource.BodyCount];
                     bodyFrame.GetAndRefreshBodyData(_bodies);
                     bool isFirst = true;
@@ -186,6 +187,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
 
                         SetState(3);
                         //MyCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
+                        mainWin.XAMLCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
                         isFirst = false;
                     }
                 }
