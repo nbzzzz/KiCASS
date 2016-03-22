@@ -132,17 +132,13 @@ namespace LaptopOrchestra.Kinect.Model
 
         private void UpdateFirstArray()
         {
-            Debug.WriteLine("\nAddTabs");
-
+            //Debug.WriteLine("\nAddTabs");
             NumSessions = 0;
-            //FirstList = new ObservableCollection<string>();
 
             AllJoints = new string[20, 25]; 
             SessionWorker[] workers = new SessionWorker[_sessionManager.OpenConnections.Count];
             _sessionManager.OpenConnections.CopyTo(workers);
             var jointTypes = Enum.GetValues(typeof(JointType));
-
-            //string[] TempArray1 = new string[20];
             FirstArray = new string[20];
 
             foreach (SessionWorker sw in workers)
@@ -164,8 +160,6 @@ namespace LaptopOrchestra.Kinect.Model
                         MyJointList.Add(jt.ToString());
                     }
                 }
-                //update FirstList (GUI)
-                //moved
 
                 //get joint array
                 string[] MyJointArray = MyJointList.ToArray();
@@ -192,7 +186,6 @@ namespace LaptopOrchestra.Kinect.Model
             int y = 0;
             int z = 0;
             var TempList = new ObservableCollection<string>(FirstArray);
-            //SelectedTab = null;
 
             //Find Tab to show
             for (y = 0; y < 20; y++)
@@ -229,9 +222,7 @@ namespace LaptopOrchestra.Kinect.Model
                 int index = 0;
                 for (index = 0; index < NumSessions; index++)
                 {
-                    Debug.WriteLine("\n index: " + index + ", NumSess = " + NumSessions);
-                    Debug.WriteLine("\n id: "+ id);
-                    Debug.WriteLine("\n : FirstList[index]" + FirstList[index]);
+                    //Debug.WriteLine("\n index: " + index + ", NumSess = " + NumSessions + "\nid: "+ id + "\n : FirstList[index]" + FirstList[index]);
                     if (FirstList[index] == id) break;
                 }
                 
@@ -249,21 +240,6 @@ namespace LaptopOrchestra.Kinect.Model
                     this.SecondList = TempList2;
                 });
             }
-        }
-
-        public void Close()
-        {
-            Debug.WriteLine("\n TabViewModel.Close1");
-            DispatchService.Stop();
-
-            Debug.WriteLine("\n TabViewModel.Close2");
-            _timer.Stop();
-
-            Debug.WriteLine("\n TabViewModel.Close3");
-            _timer.Close();
-            
-
-            //System.Windows.Application.Current.Shutdown();
         }
         #endregion
 
@@ -300,5 +276,4 @@ public static class DispatchService
         Dispatcher dispatchObject = Application.Current.Dispatcher;
         dispatchObject.InvokeShutdown();
     }
-
 }

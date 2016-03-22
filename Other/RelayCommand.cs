@@ -1,8 +1,9 @@
-﻿using System;
+﻿//MVVM Light Toolkit RelayCommand
+
+using System;
 using System.Diagnostics;
 using System.Windows.Input;
 
-//MVVM Light Toolkit RelayCommand
 namespace LaptopOrchestra.Kinect
 {
     /// <summary>

@@ -7,9 +7,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Windows.Controls;
 
 //UI THREAD
 namespace LaptopOrchestra.Kinect.ViewModel
@@ -24,48 +21,6 @@ namespace LaptopOrchestra.Kinect.ViewModel
         private KinectProcessor _kinectProcessor;
         private UDPReceiver _udpRec;
         private IList<Body> _bodies;
-
-        private Canvas _myCanvas;
-        public Canvas MyCanvas
-        {
-            get { return _myCanvas; }
-            set
-            {
-                if (_myCanvas != value)
-                {
-                    _myCanvas = value;
-                    NotifyPropertyChanged("MyCanvas");
-                }
-            }
-        }
-
-        private System.Windows.Media.ImageSource _myFrame;
-        public System.Windows.Media.ImageSource MyFrame
-        {
-            get { return _myFrame; }
-            set
-            {
-                if (_myFrame != value)
-                {
-                    _myFrame = value;
-                    NotifyPropertyChanged("MyFrame");
-                }
-            }
-        }
-
-        private Image _myImage;
-        public Image MyImage
-        {
-            get { return _myImage; }
-            set
-            {
-                if (_myImage != value)
-                {
-                    _myImage = value;
-                    NotifyPropertyChanged("MyImage");
-                }
-            }
-        }
 
         private MainWindowModel _currentState;
         public MainWindowModel CurrentState
@@ -115,7 +70,6 @@ namespace LaptopOrchestra.Kinect.ViewModel
             _udpRec = new UDPReceiver(8080, _sessionManager, _kinectProcessor);
             _coordinateMapper = _kinectProcessor.CoordinateMapper;
             CurrentState = new MainWindowModel();
-            MyCanvas = new Canvas();
             SetState(0);
 
             //Start the background thread for updating tabs.
@@ -160,7 +114,6 @@ namespace LaptopOrchestra.Kinect.ViewModel
             {
                 using (bodyFrame)
                 {
-                    //MyCanvas.Children.Clear();
                     mainWin.XAMLCanvas.Children.Clear();
                     _bodies = new Body[bodyFrame.BodyFrameSource.BodyCount];
                     bodyFrame.GetAndRefreshBodyData(_bodies);
@@ -186,7 +139,6 @@ namespace LaptopOrchestra.Kinect.ViewModel
                         }
 
                         SetState(3);
-                        //MyCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
                         mainWin.XAMLCanvas.DrawSkeleton(body, alignedJointPoints, isFirst);
                         isFirst = false;
                     }
@@ -237,26 +189,11 @@ namespace LaptopOrchestra.Kinect.ViewModel
             }
         }
 
-        public void Close()
-        {
-            Debug.WriteLine("\n MainWindowViewModel.Close1");
-            MyTabWindowViewModel.Close();
-
-            Debug.WriteLine("\n MainWindowViewModel.Close2");
-            _kinectProcessor.StopKinect();
-
-            Debug.WriteLine("\n MainWindowViewModel.Close3");
-            _sessionManager.CloseAllConnections();
-
-            Debug.WriteLine("\n MainWindowViewModel.Close4");
-            _udpRec.Close();
-
-            //System.Windows.Application.Current.Shutdown();
-        }
         #endregion
 
         #region Commands
         //Commands for the menu and buttons
+
         private RelayCommand _exitCommand;
         public RelayCommand ExitCommand
         {
@@ -271,8 +208,7 @@ namespace LaptopOrchestra.Kinect.ViewModel
         }
         private void ExitCommandLogic()
         {
-            this.Close();
-            //System.Windows.Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private RelayCommand _flipCameraCommand;
@@ -292,30 +228,28 @@ namespace LaptopOrchestra.Kinect.ViewModel
             if (CurrentState.ImageOrientationFlag == 1)
             {
                 CurrentState.ImageOrientationFlag = -1;
-                //orientation_button.Style = Resources["MetroButton2"] as Style;
             }   
             else
             {
                 CurrentState.ImageOrientationFlag = 1;
-                //orientation_button.Style = Resources["MetroButton"] as Style;
             }
         }
 
-        private RelayCommand _openGitHubCommand;
-        public RelayCommand OpenGitHubCommand
+        private RelayCommand _openWebsiteCommand;
+        public RelayCommand OpenWebsiteCommand
         {
             get
             {
-                if (_openGitHubCommand == null)
+                if (_openWebsiteCommand == null)
                 {
-                    _openGitHubCommand = new RelayCommand(param => this.OpenGitHubCommandLogic());
+                    _openWebsiteCommand = new RelayCommand(param => this.OpenWebsiteCommandLogic());
                 }
-                return _openGitHubCommand;
+                return _openWebsiteCommand;
             }
         }
-        private void OpenGitHubCommandLogic()
+        private void OpenWebsiteCommandLogic()
         {
-            Process.Start("https://msarge2015.github.io/KiCASS");
+            Process.Start("https://ubcimpart.wordpress.com");
         }
 
         private RelayCommand _aboutCommand;
@@ -333,9 +267,10 @@ namespace LaptopOrchestra.Kinect.ViewModel
         private void AboutCommandLogic()
         {
             //inserting about command logic here
-            const string message = "KiCASS was created and developed by students from the University of British Columbia, Canada."
-                + "\n\nRead more about the project at their blog: http://www.ubcimpart.wordpress.com."
-                + "\n\nKiCASS ver.0.29. Released Jan 29, 2016 on the MIT License.";
+            const string message = "KiCASS was created and developed by students from the University of British Columbia, Canada:"
+                + "\n\nIsaac Cheng, Russil Glover, Kelsey Hawley, Kevin Hui, and Michael Sargent."
+                + "\n\nRead more about the project at the UBC IMPART blog: http://www.ubcimpart.wordpress.com."
+                + "\n\nKiCASS ver.1.00. Released Mar 22, 2016.";
             const string caption = "About KiCASS";
             var result = System.Windows.Forms.MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿//MVVM Light Toolkit ViewModelBase
+
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
