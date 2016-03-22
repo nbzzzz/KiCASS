@@ -90,16 +90,31 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Canvas Name="XAMLCanvas2" Grid.Column="0"
-                            Width="auto"
-                            Height="auto"
-                            ClipToBounds="False"
-                            Background="AliceBlue"/>
-                        <Image Name="XAMLImage" Grid.Column="0"/>
-                        <Canvas Name="XAMLCanvas" Grid.Column="0"
-                            Width="{Binding ActualWidth, ElementName=XAMLImage}"
-                            Height="{Binding ActualHeight, ElementName=XAMLImage}"
-                            ClipToBounds="True"/>
+                        <Image Name="XAMLImage"
+                               Grid.Column="0"
+                               RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform
+                                        x:Name="scaleImage"
+                                        ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+                        <Canvas Name="XAMLCanvas"
+                                Grid.Column="0"
+                                RenderTransformOrigin="0.5,0.5"
+                                Width="{Binding ActualWidth, ElementName=XAMLImage}"
+                                Height="{Binding ActualHeight, ElementName=XAMLImage}"
+                                ClipToBounds="True">
+                            <Canvas.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform
+                                        x:Name="scaleCanvas"
+                                        ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>  
+                                </TransformGroup>
+                            </Canvas.RenderTransform>
+                        </Canvas>
                     </Grid>
                 </DockPanel>
             </Viewbox>
