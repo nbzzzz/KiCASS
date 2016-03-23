@@ -1,84 +1,49 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="App.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using log4net.Config;
-using Microsoft.Kinect;
-using System.Windows.Forms;
+using LaptopOrchestra.Kinect.ViewModel;
+using System;
 using System.ComponentModel;
-
-[assembly: XmlConfigurator(Watch = true)]
+using System.Windows.Forms;
 
 namespace LaptopOrchestra.Kinect
 {
-    /// <summary>
-    ///     Interaction logic for App
-    /// </summary>
     public partial class App : System.Windows.Application
     {
-        /// <summary>
-        ///     Configuration Items selected
-        /// </summary>
-        public Dictionary<JointType, bool> ConfigurationFlags;
 
-        /// <summary>
-        ///      Kinect 2.0 object that publishes new data
-        /// </summary>
-        public KinectProcessor KinectProcessor;
+        MainWindow window;
+        MainWindowViewModel viewModel;
 
-        /// <summary>
-        ///     Manages the active connections to KiCASS
-        /// </summary>
-        public SessionManager SessionManager;
-
-
-        /// <summary>
-        ///     GUI for managing kinect data
-        /// </summary>
-        public ConfigurationTool configurationTool;
-        /// <summary>
-        ///     Execute start up tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            ShutdownMode = ShutdownMode.OnLastWindowClose;
+            //base.OnStartup(e);
 
             // Initialize logger
             XmlConfigurator.Configure();
             Logger.Debug("App Startup");
 
-            ConfigurationFlags = new Dictionary<JointType, bool>();
+            //Create the main window view.
+            //MainWindow window = new MainWindow();
+            window = new MainWindow();
 
-            KinectProcessor = new KinectProcessor();
+            // Create the ViewModel to which the main window binds.
+            //MainWindowViewModel viewModel = new MainWindowViewModel();
+            viewModel = new MainWindowViewModel();
 
-			SessionManager = new SessionManager();
+            // Allow all controls in the window to bind to the ViewModel by
+            //setting the DataContext, which propagates down the element tree.
+            window.DataContext = viewModel;
 
-			var udpReceiver = new UDPReceiver(8080, SessionManager, KinectProcessor);
+            //Show the main window.
+            window.Show();
 
-            // Initialize main GUI
-            configurationTool = new ConfigurationTool(SessionManager, KinectProcessor)
-            {
-                Top = 0,
-                Left = 0
-            };
-            configurationTool.Show();
-            System.Windows.Application.Current.MainWindow.Closing += new CancelEventHandler(MainWindow_Closing);
-        }        
+            System.Windows.Application.Current.MainWindow.Closing += new CancelEventHandler(App_Exit);
+        }
 
         public static bool CloseCancel()
         {
             const string message = "Are you sure that you would like to close KICASS?";
             const string caption = "Cancel Installer";
-            var result = System.Windows.Forms.MessageBox.Show(message, caption,
-                             MessageBoxButtons.YesNo,
-                             MessageBoxIcon.Question);
+            var result = System.Windows.Forms.MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
                 return true;
@@ -86,23 +51,12 @@ namespace LaptopOrchestra.Kinect
                 return false;
         }
 
-        public void MainWindow_Closing(object sender, CancelEventArgs e)
+        public void App_Exit(object sender, CancelEventArgs e)
         {
             if (CloseCancel())
-            {
-                Logger.Info("Closing Connections");
-                SessionManager.CloseAllConnections();
-                Logger.Info("Shut down Kinect");
-                KinectProcessor.StopKinect();
-                Logger.Info("Kill the update thread in the GUI");
-                configurationTool.KillUpdateThread();
-                Logger.Info("KiCASS Exited Succesfully");
-                e.Cancel = false;
-            }
+                Environment.Exit(Environment.ExitCode);
             else
-            {
                 e.Cancel = true;
-            }
         }
     }
 }

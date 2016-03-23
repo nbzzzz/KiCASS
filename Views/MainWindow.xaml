@@ -1,0 +1,111 @@
+﻿<Window
+    x:Class="LaptopOrchestra.Kinect.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:src ="clr-namespace:LaptopOrchestra.Kinect"
+    Title="KiCASS-desktop | UBC Laptop Orchestra"
+    FontSize="13"
+    FontFamily="Verdana"
+    WindowState="Maximized"
+    HorizontalAlignment="Center"
+    WindowStartupLocation="CenterScreen"
+    Width="1200" Height="600"
+    MinWidth="900" MinHeight="450" Background="#FF717EB8">
+
+    <Window.Resources>
+        <ResourceDictionary Source="../Resources/MainWindowResources.xaml" />
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu
+            DockPanel.Dock="Top"
+            KeyboardNavigation.TabNavigation="Cycle"
+            Background="White">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem Header="T_oggle Orientation" Command="{Binding FlipCameraCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Visit UBC IMPART Website Homepage" Command="{Binding OpenWebsiteCommand}" />
+                <MenuItem Header="A_bout" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Grid
+                DockPanel.Dock="Left"
+                Margin="4,4,0,4"
+                Width="250">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="90" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0">
+                <ListBox FontSize="16"
+                        ItemsSource="{Binding MyTabWindowViewModel.FirstList}"
+                        SelectedItem="{Binding MyTabWindowViewModel.SelectedTab, Mode=TwoWay}"></ListBox>
+            </Border>
+
+            <Border Grid.Row="2">
+                <ListBox FontSize="16"
+                        ItemsSource="{Binding MyTabWindowViewModel.SecondList}"/>
+            </Border>
+
+            <Border Grid.Row="4">
+                <Button x:Name="orientation_button"
+                        Command="{Binding FlipCameraCommand}">
+                    <Image>
+                        <Image.Source>
+                            <Binding Path="CurrentState.Status"/>
+                        </Image.Source>
+                    </Image>
+                </Button>
+            </Border>
+        </Grid>
+
+        <Border Background="#FFDDDFF3" Margin="4,4,4,4">
+            <Viewbox>
+                <DockPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image Name="XAMLImage"
+                               Grid.Column="0"
+                               RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform
+                                        x:Name="scaleImage"
+                                        ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+
+                        <Canvas Name="XAMLCanvas"
+                                Grid.Column="0"
+                                RenderTransformOrigin="0.5,0.5"
+                                Width="{Binding ActualWidth, ElementName=XAMLImage}"
+                                Height="{Binding ActualHeight, ElementName=XAMLImage}"
+                                ClipToBounds="True">
+                            <Canvas.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform
+                                        x:Name="scaleCanvas"
+                                        ScaleX="{Binding CurrentState.ImageOrientationFlag}"/>
+                                </TransformGroup>
+                            </Canvas.RenderTransform>
+                        </Canvas>
+                    </Grid>
+                </DockPanel>
+            </Viewbox>
+        </Border>
+    </DockPanel>
+</Window>
