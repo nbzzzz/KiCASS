@@ -151,6 +151,8 @@ namespace LaptopOrchestra.Kinect.ViewModel
         private void UpdateSensorStatus(object sender, IsAvailableChangedEventArgs e)
         {
             SetState(0);
+            var mainWin = System.Windows.Application.Current.Windows.Cast<Window>().FirstOrDefault(window => window is MainWindow) as MainWindow;
+            mainWin.XAMLImage.Source = null;
         }
 
         protected void SetState(int state)
