@@ -97,19 +97,28 @@ namespace LaptopOrchestra.Kinect.ViewModel
                 {
                     if (frame != null)
                     {
-                        SetState(2);
+                        //SetState(2);
                         mainWin.XAMLImage.Source = frame.ToBitmap();
                     }
                 }
             }
-            else SetState(1);
+            else
+            {
+                SetState(1);
+                return;
+            }
+                
             #endregion draw bodies
 
             #region draw skeleton
             // Acquire skeleton data
             var bodyFrame = reference.BodyFrameReference.AcquireFrame();
             if (bodyFrame == null)
+            {
+                SetState(2);
                 return;
+            }
+                
             else
             {
                 using (bodyFrame)
