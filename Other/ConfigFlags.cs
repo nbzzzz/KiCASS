@@ -64,7 +64,7 @@ namespace LaptopOrchestra.Kinect
 
         private Dictionary<HandType, bool> InitHandFlags(Dictionary<HandType, bool> flags)
         {
-            var handTypes = Enum.GetValues(typeof(JointType));
+            var handTypes = Enum.GetValues(typeof(HandType));
 
             flags = new Dictionary<HandType, bool>();
 

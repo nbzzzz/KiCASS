@@ -51,9 +51,8 @@ namespace LaptopOrchestra.Kinect
             return handStateFlags;
         }
 
-	    public static bool IsValid(OscPacket packet)
+	    public static bool IsValid(String packetString)
 	    {
-	        string packetString = packet.ToString();
             string pattern = @"\/kinect\/(joint|handstate), ""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"", ([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]), ""([10]{2}|[10]{25})""";
 
             // Instantiate the regular expression object.
@@ -61,13 +60,13 @@ namespace LaptopOrchestra.Kinect
 
             // Match the regular expression pattern against a text string.
             Match m = r.Match(packetString);
-            
+
             if (!m.Success)
-	        {
-	            Logger.Error("Invalid Osc Message recieved " + packetString);
-	            return false;
-	        }
-	        return true;
-	    }
+            {
+                Logger.Error("Invalid Osc Message recieved " + packetString);
+                return false;
+            }
+            return true;
+        }
 	}
 }
