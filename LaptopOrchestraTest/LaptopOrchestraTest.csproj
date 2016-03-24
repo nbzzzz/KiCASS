@@ -58,7 +58,6 @@
     <Compile Include="OscSerializerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionManagerTest.cs" />
-    <Compile Include="TabDataTest.cs" />
     <Compile Include="SessionWorkerTest.cs" />
   </ItemGroup>
   <ItemGroup>
