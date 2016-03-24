@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:LaptopOrchestra.Kinect">
+
+    <!--
+  This style ensures that the borders in the main window are consistent.
+  -->
+    <Style x:Key="MainBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="BlueViolet"/>
+        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="BorderThickness" Value="3" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+</ResourceDictionary>

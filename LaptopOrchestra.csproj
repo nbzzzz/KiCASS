@@ -136,29 +136,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BitmapHelper.cs" />
-    <Compile Include="ConfigFlags.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="OscDeserializer.cs" />
-    <Compile Include="TabData.cs" />
-    <Compile Include="ConfigurationTool.xaml.cs">
-      <DependentUpon>ConfigurationTool.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DataSubscriber.cs" />
-    <Compile Include="KinectProcessor.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="SessionWorker.cs" />
-    <Compile Include="OscSerializer.cs" />
-    <Compile Include="SessionManager.cs" />
-    <Compile Include="UDPReceiver.cs" />
-    <Compile Include="UDPSender.cs" />
-    <Page Include="ConfigurationTool.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Compile Include="Other\BitmapHelper.cs" />
+    <Compile Include="Other\ConfigFlags.cs" />
+    <Compile Include="Other\Constants.cs" />
+    <Compile Include="Models\MainWindowModel.cs" />
+    <Compile Include="Other\OscDeserializer.cs" />
+    <Compile Include="Other\DataSubscriber.cs" />
+    <Compile Include="Other\KinectProcessor.cs" />
+    <Compile Include="Other\Logger.cs" />
+    <Compile Include="Other\RelayCommand.cs" />
+    <Compile Include="Other\SessionWorker.cs" />
+    <Compile Include="Other\OscSerializer.cs" />
+    <Compile Include="Other\SessionManager.cs" />
+    <Compile Include="Other\UDPReceiver.cs" />
+    <Compile Include="Other\UDPSender.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\TabWindowViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -202,7 +202,24 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\" />
+    <Resource Include="Assets\sensor-off.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Logo.png" />
+    <Resource Include="Assets\sensor-on-flip.jpg" />
+    <Resource Include="Assets\sensor-on.jpg" />
+    <Resource Include="Assets\sensor-tracking-flip.jpg" />
+    <Resource Include="Assets\sensor-tracking.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Resources\MainWindowResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

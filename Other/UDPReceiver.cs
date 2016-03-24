@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Rug.Osc;
+using System.Diagnostics;
 
 namespace LaptopOrchestra.Kinect
 {
@@ -32,11 +33,11 @@ namespace LaptopOrchestra.Kinect
 				// if we are in a state to recieve
 				if (_receiver.State == OscSocketState.Connected)
 				{
-					// get the next message 
-					// this will block until one arrives or the socket is closed
-					OscPacket packet = _receiver.Receive();
-
-				    Logger.Debug("Recieved packet " + packet);
+                    // get the next message 
+                    // this will block until one arrives or the socket is closed
+                    OscPacket packet = _receiver.Receive();
+                    //Debug.WriteLine("\n packet = " + packet);
+                    Logger.Debug("Recieved packet " + packet);
 
                     if (!OscDeserializer.IsValid(packet.ToString())) continue;
 
@@ -81,9 +82,8 @@ namespace LaptopOrchestra.Kinect
 
 		public void Close()
 		{
-			_receiver.Close();
-
-			_listenerThread.Join();
-		}
+            _receiver.Close();
+            _listenerThread.Join();
+        }
 	}
 }
