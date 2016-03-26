@@ -213,11 +213,12 @@ namespace LaptopOrchestra.Kinect.Model
         private void UpdateSecondList(string id)
         {
             Debug.WriteLine("\n Updating Second List!");
+            SecondList = new ObservableCollection<string>();
 
             if (id != null) //NumSessions > 0)
             {
                 //clear joint list
-                SecondList = new ObservableCollection<string>();
+                //SecondList = new ObservableCollection<string>();
                 
                 int index = 0;
                 for (index = 0; index < NumSessions; index++)
